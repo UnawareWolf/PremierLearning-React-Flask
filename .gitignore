@@ -29,3 +29,6 @@ __pycache__/
 # yarn
 .yarn/
 .yarnrc.yml
+
+# vscode
+.vscode/
