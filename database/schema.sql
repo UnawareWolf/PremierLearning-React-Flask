@@ -21,5 +21,5 @@ create table future_matches (
     player_id integer not null,
     minutes real not null,
     points real not null,
-    gameweek integer not null
+    gameweek integer
 );

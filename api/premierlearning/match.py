@@ -11,8 +11,6 @@ class RawMatch(ABC):
         self.gameweek = None
 
     def format_as_db_insert(self):
-        if self.gameweek is None:
-            self.gameweek = 0
         return (
             self.player_id,
             float(self.minutes),
