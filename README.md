@@ -26,6 +26,8 @@
 
 [Application Context](https://flask.palletsprojects.com/en/1.1.x/appcontext/)
 
+[Flask CORS](https://flask-cors.readthedocs.io/en/latest/)
+
 ### SQLite
 
 [SQLite3 Python DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-sqlite3-module-in-python-3)
