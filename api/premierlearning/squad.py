@@ -184,11 +184,11 @@ class Squad:
 
         # Constraints for number of players per team
         for team_no in range(1, 21):
-            starters_model += lpSum(x[i] * int(self.wrapped_player_dict[i].player.team.id == team_no) +
-                                    y1[i] * int(self.wrapped_player_dict[i].player.team.id == team_no) +
-                                    y2[i] * int(self.wrapped_player_dict[i].player.team.id == team_no) +
-                                    y3[i] * int(self.wrapped_player_dict[i].player.team.id == team_no) +
-                                    z[i] * int(self.wrapped_player_dict[i].player.team.id == team_no)
+            starters_model += lpSum(x[i] * int(self.wrapped_player_dict[i].player.team_id == team_no) +
+                                    y1[i] * int(self.wrapped_player_dict[i].player.team_id == team_no) +
+                                    y2[i] * int(self.wrapped_player_dict[i].player.team_id == team_no) +
+                                    y3[i] * int(self.wrapped_player_dict[i].player.team_id == team_no) +
+                                    z[i] * int(self.wrapped_player_dict[i].player.team_id == team_no)
                                     for i in valid_player_ids) <= MAX_PLAYERS_PER_TEAM
 
         # Constraints for number of players per position
@@ -425,10 +425,10 @@ class Squad:
     def team_numbers_are_valid(players):
         team_counts = {}
         for player in players:
-            if player.team.name not in team_counts.keys():
-                team_counts[player.team.name] = 1
+            if player.team_id not in team_counts.keys():
+                team_counts[player.team_id] = 1
             else:
-                team_counts[player.team.name] += 1
+                team_counts[player.team_id] += 1
 
         for i in team_counts.values():
             if i > 3:

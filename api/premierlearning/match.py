@@ -1,12 +1,33 @@
 from datetime import datetime, timedelta
+from abc import ABC
 
 
-class Match:
+class RawMatch(ABC):
+
+    def __init__(self):
+        self.player_id = None
+        self.minutes = None
+        self.points = None
+        self.gameweek = None
+
+    def format_as_db_insert(self):
+        if self.gameweek is None:
+            self.gameweek = 0
+        return (
+            self.player_id,
+            float(self.minutes),
+            float(self.points),
+            self.gameweek
+        )
+
+
+class Match(RawMatch):
 
     def __init__(self, player, match_json, teams):
-        # position should maybe be included as a boolean for each.
+        super().__init__()
 
         self.player = player
+        self.player_id = self.player.id
         self.gameweek = match_json['round']
 
         self.is_gkp = int(player.position == 1)
@@ -59,10 +80,13 @@ class Match:
                                     self.opponent_team.name, self.points)
 
 
-class FutureMatch:
+class FutureMatch(RawMatch):
 
     def __init__(self, player, future_match_json, teams):
+        super().__init__()
+
         self.player = player
+        self.player_id = self.player.id
         self.gameweek = future_match_json['event']
 
         self.is_gkp = int(player.position == 1)
@@ -108,10 +132,10 @@ class FutureMatch:
         self.average_minutes_last_5 = 0
         self.average_minutes = 0
         self.matches_available = 0
-        self.expected_minutes = 0
+        self.minutes = 0
 
     def update_points_based_on_expected_minutes(self):
-        if self.expected_minutes <= 40 or self.average_minutes_last_3 < 40 or self.matches_played < 3:
+        if self.minutes <= 40 or self.average_minutes_last_3 < 40 or self.matches_played < 3:
             self.points = 0
         if self.chance_of_playing is not None:
             self.points = self.chance_of_playing * self.points / 100

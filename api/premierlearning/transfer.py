@@ -20,6 +20,9 @@ class Transfer:
 
     def is_within_budget(self, bank):
         return self.get_net_value() + bank >= 0
+    
+    def __repr__(self):
+        return self.__str__()
 
     def __str__(self):
         return str(self.player_out) + " -> " + str(self.player_in)

@@ -7,10 +7,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from keras.models import Sequential
 from keras.layers import Dense
 from sklearn import linear_model
-
 from .season import *
 from .formatted_match_data import FormattedMatchData
 from .squad import Squad
+from .db_handler import DB_Handler
 
 FANTASY_JSON_FILE_LOCATION = 'data/season_20_21/fantasy.json'
 FIXTURES_JSON_FILE_LOCATION = 'data/season_20_21/fixtures.json'
@@ -53,6 +53,8 @@ class Runner:
 
         self.learn()
         self.current_season.calculate_player_points_over_next_5_gameweeks()
+
+        self.persist_players()
 
         self.populate_squad()
 
@@ -256,7 +258,7 @@ class Runner:
 
         for i in range(len(future_matches)):
             future_matches[i].points = averaged_predictions[i][0]
-            future_matches[i].expected_minutes = averaged_minute_predictions[i][0]
+            future_matches[i].minutes = averaged_minute_predictions[i][0]
             future_matches[i].update_points_based_on_expected_minutes()
 
     def get_single_model_predictions(self, future_matches):
@@ -301,6 +303,17 @@ class Runner:
         numpy_input_data = numpy.array(input_data)
         future_predictions = model.predict(numpy_input_data)
         return future_predictions
+    
+    def persist_players(self):
+        db_handler = DB_Handler('../database')
+        db_handler.init_db()
+        db_handler.persist_players(self.current_season.players)
+        db_handler.connection.commit()
+        db_handler.close_connection()
+
+    def dump_element_types(self):
+        with open('element_types.json', 'w') as f:
+            json.dump(self.current_season.element_type_dict, f)
 
     def populate_squad(self):
         print('Populating squad...')

@@ -1,11 +1,58 @@
 import numpy
 
+from abc import ABC
 from .match import Match, FutureMatch
 
 
-class Player:
+class RawPlayer(ABC):
+
+    def __init__(self):
+        self.id = None
+        self.first_name = None
+        self.last_name = None
+        # self.team = None
+        # self.team.id = None
+        self.team_id = None
+        self.current_cost = None
+        self.position = None
+        self.matches = None
+        self.future_matches = None
+    
+    def __repr__(self):
+        points = 0
+        if len(self.future_matches) > 0:
+            points = self.future_matches[0].points
+        return '%s %s: %.1f (£%.1fm)' % (self.first_name, self.last_name, points, self.current_cost)
+    
+    def format_as_db_insert(self):
+        return (
+            self.id,
+            self.first_name,
+            self.last_name,
+            self.team_id,
+            self.current_cost,
+            self.position
+        )
+    
+
+    def get_points_between_gameweeks(self, gameweek_from, gameweek_to, bench_multiplier, bench_boost_gw, free_hit_gw):
+        return sum(self.get_points_in_gameweek_n(n, bench_multiplier, bench_boost_gw, free_hit_gw) for n in range(gameweek_from, gameweek_to + 1))
+
+
+    def get_points_in_gameweek_n(self, n, bench_multiplier, bench_boost_gw, free_hit_gw):
+        # bench_multiplier = 1
+        if n == bench_boost_gw:
+            bench_multiplier = 1
+        if n == free_hit_gw:
+            bench_multiplier = 0
+        return sum(fixture.points for fixture in self.future_matches if fixture.gameweek == n) * bench_multiplier
+
+
+class Player(RawPlayer):
 
     def __init__(self, fantasy_json, element_dict, player_json, teams, current_gameweek):
+        super().__init__()
+        
         self.played_last_season = False
         self.points_per_min_last_season = 0
         self.current_gameweek = current_gameweek
@@ -42,6 +89,8 @@ class Player:
         self.future_matches = []
 
         self.team = teams[int(self.element_dict['team'])]
+
+        self.team_id = self.team.id
 
         self.populate_matches(teams)
 
@@ -184,21 +233,8 @@ class Player:
     #             points += fixture.points
     #     return points
 
-    def get_points_between_gameweeks(self, gameweek_from, gameweek_to, bench_multiplier, bench_boost_gw, free_hit_gw):
-        return sum(self.get_points_in_gameweek_n(n, bench_multiplier, bench_boost_gw, free_hit_gw) for n in range(gameweek_from, gameweek_to + 1))
-        # return sum(fixture.points for fixture in self.future_matches if fixture.gameweek is not None and
-        #            gameweek_from <= fixture.gameweek <= gameweek_to)
-
     def calculate_points_over_next_5_gameweeks(self):
         self.points_over_next_5_gameweeks = self.get_points_within_n_gameweeks(5)
-
-    def get_points_in_gameweek_n(self, n, bench_multiplier, bench_boost_gw, free_hit_gw):
-        # bench_multiplier = 1
-        if n == bench_boost_gw:
-            bench_multiplier = 1
-        if n == free_hit_gw:
-            bench_multiplier = 0
-        return sum(fixture.points for fixture in self.future_matches if fixture.gameweek == n) * bench_multiplier
 
     def get_points_within_n_gameweeks(self, n):
         return sum(fixture.points for fixture in self.future_matches

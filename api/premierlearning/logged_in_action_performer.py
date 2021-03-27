@@ -10,7 +10,7 @@ TRANSFERS_API = 'https://fantasy.premierleague.com/api/transfers/'
 
 def login(client):
     client.get(LOGIN_URL)
-    with open('.vscode/fantasy_login.json') as json_file:
+    with open('../.vscode/fantasy_login.json') as json_file:
         fantasy_login = json.load(json_file)
     login_data = dict(app='plusers', redirect_uri=REDIRECT_URI, login=fantasy_login['EMAIL'],
                       password=fantasy_login['PASSWORD'], csrfmiddlewaretoken=client.cookies['csrftoken'])
