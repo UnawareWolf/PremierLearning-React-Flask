@@ -1,5 +1,5 @@
 from .squad import Squad
-from .db_handler import DB_Handler
+from persistence import DB_Handler
 
 import json
 
@@ -14,7 +14,6 @@ class OptimiseRunner:
             elements_dict =  json.load(f_in)
 
         db_handler = DB_Handler('../database')
-        # db_handler.init_db()
         players = db_handler.get_players()
         db_handler.close_connection()
 

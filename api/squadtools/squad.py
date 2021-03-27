@@ -4,8 +4,8 @@ import math
 
 from pulp import LpMaximize, LpProblem, lpSum, LpVariable, PULP_CBC_CMD
 
-from .transfer import Transfer
-from .player import Player
+from premierlearning import Transfer
+from premierlearning import RawPlayer
 from .logged_in_action_performer import pick_team, get_player_ids, make_transfers
 
 MANAGER_API = 'https://fantasy.premierleague.com/api/entry/%i/'
@@ -533,7 +533,7 @@ class Squad:
 
 class WrappedPlayer:
 
-    def __init__(self, player: Player, purchase_price):
+    def __init__(self, player: RawPlayer, purchase_price):
         self.player = player
         self.purchase_price = purchase_price
         self.selling_price = self.get_selling_price()

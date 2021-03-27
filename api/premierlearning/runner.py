@@ -9,8 +9,8 @@ from keras.layers import Dense
 from sklearn import linear_model
 from .season import *
 from .formatted_match_data import FormattedMatchData
-from .squad import Squad
-from .db_handler import DB_Handler
+from squadtools import Squad
+from persistence import DB_Handler
 
 FANTASY_JSON_FILE_LOCATION = 'data/season_20_21/fantasy.json'
 FIXTURES_JSON_FILE_LOCATION = 'data/season_20_21/fixtures.json'
