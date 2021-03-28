@@ -12,10 +12,10 @@ class OptimiseRunner:
         
     def run(self):
         
-        with open('element_types.json') as f_in:
+        with open('data/element_types.json') as f_in:
             elements_dict =  json.load(f_in)
 
-        db_handler = DB_Handler('../database')
+        db_handler = DB_Handler()
         players = db_handler.get_players()
         db_handler.close_connection()
 

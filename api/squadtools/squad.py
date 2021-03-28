@@ -355,11 +355,11 @@ class Squad:
             one_hit_strategy = self.get_transfer_strategy(self.free_transfers + 1, best_five_transfers)
             two_hit_strategy = self.get_transfer_strategy(self.free_transfers + 2, best_five_transfers)
 
-            a = self.get_accurate_points_for_strategy(no_hit_strategy)
-            b = self.get_accurate_points_for_strategy(one_hit_strategy)
-            c = self.get_accurate_points_for_strategy(two_hit_strategy)
+            # a = self.get_accurate_points_for_strategy(no_hit_strategy)
+            # b = self.get_accurate_points_for_strategy(one_hit_strategy)
+            # c = self.get_accurate_points_for_strategy(two_hit_strategy)
 
-            print()
+            # print()
 
             strategy = no_hit_strategy
             # suggested_transfers = self.get_transfer_strategy(2, best_five_transfers)

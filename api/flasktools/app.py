@@ -1,17 +1,14 @@
-# import os
-
 from flask import Flask
 from flask_cors import CORS
 from .selection_route import bp as selection_bp
+from persistence import close_connection
 
 
-def create_app(test_config=None):
+def create_app():
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
-    # app.config.from_mapping(
-    #     SECRET_KEY="dev",
-    #     DATABASE=os.path.join(app.instance_path, 'fantasy.db')
-    # )
+
+    app.teardown_appcontext(close_connection)
 
     app.register_blueprint(selection_bp)
 

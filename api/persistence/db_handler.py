@@ -1,13 +1,33 @@
 import sqlite3
+
+from flask import g
+
 from premierlearning import RawMatch
 from premierlearning import RawPlayer
+
+DATABASE = '../database/fantasy.db'
+DROP = '../database/drop_tables.sql'
+SCHEMA = '../database/schema.sql'
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 class DB_Handler:
 
-    def __init__(self, database_directory):
-        self.db_dir = database_directory
-        self.connection = sqlite3.connect(self.db_dir + '/fantasy.db')
+    def __init__(self):
+        # self.connection = sqlite3.connect(DATABASE)
+        self.connection = get_db()
         self.cursor = self.connection.cursor()
     
     def close_connection(self):
@@ -19,8 +39,8 @@ class DB_Handler:
             self.cursor.executescript(f.read())
 
     def init_db(self):
-        self.run_sql_script(self.db_dir + '/drop_tables.sql')
-        self.run_sql_script(self.db_dir + '/schema.sql')
+        self.run_sql_script(DROP)
+        self.run_sql_script(SCHEMA)
     
     def persist_players(self, players):
         for player in players:
