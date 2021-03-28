@@ -1,12 +1,11 @@
-import os
+# import os
 
 from flask import Flask
 from flask_cors import CORS
-from .selectionroute import bp as selection_bp
+from .selection_route import bp as selection_bp
 
 
 def create_app(test_config=None):
-    """Create and configure the app"""
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
     # app.config.from_mapping(

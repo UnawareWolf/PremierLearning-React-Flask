@@ -21,8 +21,6 @@ class OptimiseRunner:
         self.squad = Squad(players, elements_dict, 30)
         self.squad.populate_by_log_in(7414114)
         self.squad.make_sensible_transfers()
-
-        print()
     
     def get_a_player(self):
         return str(self.squad.squad[0])
