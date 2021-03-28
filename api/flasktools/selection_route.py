@@ -11,4 +11,4 @@ CORS(bp)
 def time_test():
     optimise_runner = OptimiseRunner()
     optimise_runner.run()
-    return {'time': optimise_runner.get_a_player()}
+    return {'time': optimise_runner.get_transfers()}

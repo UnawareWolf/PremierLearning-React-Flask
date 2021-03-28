@@ -349,6 +349,7 @@ class Squad:
 
     def make_sensible_transfers(self):
         best_five_transfers = self.get_suggested_transfers(5)
+        strategy = None
         if len(best_five_transfers) > 0:
             no_hit_strategy = self.get_transfer_strategy(self.free_transfers, best_five_transfers)
             one_hit_strategy = self.get_transfer_strategy(self.free_transfers + 1, best_five_transfers)
@@ -359,10 +360,13 @@ class Squad:
             c = self.get_accurate_points_for_strategy(two_hit_strategy)
 
             print()
+
+            strategy = no_hit_strategy
             # suggested_transfers = self.get_transfer_strategy(2, best_five_transfers)
             #
             # for transfer in suggested_transfers:
             #     self.make_transfer(transfer)
+        return strategy
 
     def get_accurate_points_for_strategy(self, transfer_strategy):
         gameweek = self.next_gameweek
