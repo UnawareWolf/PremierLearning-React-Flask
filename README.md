@@ -4,7 +4,7 @@
 
 ### 1.1 [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api)
 
-The [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api) directory contains python backend code, including modules to contain flask and tools for the project explained below.
+The [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api) directory contains python backend code and player data.
 
 #### 1.1.1 [`flasktools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/flasktools)
 
