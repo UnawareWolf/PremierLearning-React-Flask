@@ -1,6 +1,36 @@
 # Premier Learning
 
-## Tutorials
+## 1 The Project
+
+### 1.1 [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api)
+
+The [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api) directory contains python backend code, including modules to contain flask and tools for the project explained below.
+
+#### 1.1.1 [`flasktools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/flasktools)
+
+This python module creates the flask app and attaches blueprints for url routes. The routes give access to [`squadtools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/squadtools) to get transfer suggestions and [`premierlearning`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/premierlearning) for admin to re-learn the model.
+
+#### 1.1.2 [`persistence`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/persistence)
+
+This python module handles interactions with the database; it inserts players created from [`premierlearning`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/premierlearning) and also extracts players for squad optimising.
+
+#### 1.1.3 [`premierlearning`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/premierlearning)
+
+This python module updates player data in [`data`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/data) with calls to the fantasy premier league api. It uses this data to initialise player objects which are inputs to the tensor flow machine learning model that predicts future player scores. These predictions are attached to the original player objects and saved to the database via [`persistence`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/persistence).
+
+#### 1.1.4 [`squadtools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/squadtools)
+
+This python module selects learnt players from the database via [`persistence`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/persistence), logs in to a user's fantasy team with a call to the fantasy premier league api and uses a pulp linear-optimisation model to offer transfer suggestions.
+
+#### 1.1.5 [`data`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/data)
+
+This directory holds player data from the fantasy premier league api in csv and json files.
+
+## 1.2 [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/src)
+
+The [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/src) directory contains front end react code which calls the python api and renders results.
+
+## 2 Tutorials
 
 ### Machine Learning
 
@@ -16,7 +46,7 @@
 
 ### TypeScript
 
-[Ben Awad TypeScript React](https://www.youtube.com/watch?v=Z5iWr6Srsj8)
+[TypeScript React Ben Awad YouTube video](https://www.youtube.com/watch?v=Z5iWr6Srsj8)
 
 ### Flask
 
