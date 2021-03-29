@@ -42,12 +42,16 @@ class Squad:
 
         self.populate_player_dict(players)
         self.populate_wrapped_player_dict(players)
+        self.username = None
+        self.password = None
 
-    def populate_by_log_in(self, manager_id):
+    def populate_by_log_in(self, manager_id, username, password):
+        self.username = username
+        self.password = password
         self.manager_id = manager_id
         manager_json = requests.get(MANAGER_API % manager_id).json()
 
-        manager_picks_json = get_player_ids(self.manager_id).json()
+        manager_picks_json = get_player_ids(self.manager_id, self.username, self.password).json()
 
         try:
             self.budget = manager_json['last_deadline_value'] + manager_json['last_deadline_bank']
@@ -515,7 +519,7 @@ class Squad:
 
     def log_in_and_pick_team(self):
         request_payload = self.pick_team_request_format()
-        pick_team(self.manager_id, request_payload)
+        pick_team(self.manager_id, request_payload, self.username, self.password)
 
     def format_transfer_requests(self):
         request_payload = {
@@ -531,7 +535,7 @@ class Squad:
 
     def log_in_and_make_transfers(self):
         request_payload = self.format_transfer_requests()
-        make_transfers(request_payload)
+        make_transfers(request_payload, self.username, self.password)
         self.transfers_done.clear()
 
 
