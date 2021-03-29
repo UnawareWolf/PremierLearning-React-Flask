@@ -75,3 +75,7 @@ The [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main
 [Miguel Grinberg blog: react and flask on server using NGINX](https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project)
 
 [Linode: securing your server](https://www.linode.com/docs/guides/securing-your-server/)
+
+[HTTPS setup with Let's Encrypt/Certbot](https://letsencrypt.org/getting-started/)
+
+[HTTPS more detailed instructions with DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04)
