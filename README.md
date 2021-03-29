@@ -44,6 +44,8 @@ The [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main
 
 [Async, Await Fireship YouTube video](https://www.youtube.com/watch?v=vn3tm0quoqE)
 
+[Sending Requests DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-call-web-apis-with-the-useeffect-hook-in-react)
+
 ### TypeScript
 
 [TypeScript React Ben Awad YouTube video](https://www.youtube.com/watch?v=Z5iWr6Srsj8)
@@ -57,6 +59,8 @@ The [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main
 [Application Context](https://flask.palletsprojects.com/en/1.1.x/appcontext/)
 
 [Flask CORS](https://flask-cors.readthedocs.io/en/latest/)
+
+[Receiving Requests](https://www.digitalocean.com/community/tutorials/processing-incoming-request-data-in-flask)
 
 ### SQLite
 
