@@ -12,4 +12,4 @@ def time_test():
     # print('username: %s, password: %s' % (username, password))
     optimise_runner = OptimiseRunner(int(request_data['manager_id']), request_data['username'], request_data['password'])
     optimise_runner.run()
-    return {'transfers': str(optimise_runner.get_transfers())}
+    return {'transfers': optimise_runner.get_transfers()}

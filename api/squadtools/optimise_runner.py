@@ -27,21 +27,18 @@ class OptimiseRunner:
         self.transfers = self.squad.make_sensible_transfers()
     
     def get_transfers(self):
-        # transfers_string = ''
-        temp_gameweek = self.squad.next_gameweek
-        transfer_index = 0
-        transfers_dict = {}
-        for scheme_entry in self.transfers['scheme']:
-            
-            # transfers_string += 'gameweek %i transfers:\n' % temp_gameweek
-            for _ in range(scheme_entry):
-                if temp_gameweek not in transfers_dict:
-                    transfers_dict[temp_gameweek] = [str(self.transfers['transfer_tuple'][transfer_index])]
-                else:
-                    transfers_dict[temp_gameweek].append(str(self.transfers['transfer_tuple'][transfer_index]))
-                # transfers_string += '%s\n' % self.transfers['transfer_tuple'][transfer_index]
-                transfer_index += 1
-            temp_gameweek += 1
-            # transfers_string += '\n'
-        # return transfers_string
-        return transfers_dict
+        transfer_list = []
+        for transfer in self.transfers['transfer_tuple']:
+            transfer_list.append(str(transfer))
+        return transfer_list
+        # temp_gameweek = self.squad.next_gameweek
+        # transfer_index = 0
+        # transfers_list = []
+        # for scheme_entry in self.transfers['scheme']:
+        #     transfer_gw_dict = {'gameweek': temp_gameweek, 'transfers': [] }
+        #     for _ in range(scheme_entry):
+        #         transfer_gw_dict['transfers'].append(str(self.transfers['transfer_tuple'][transfer_index]))
+        #         transfer_index += 1
+        #     transfers_list.append(transfer_gw_dict)
+        #     temp_gameweek += 1
+        # return transfers_list
