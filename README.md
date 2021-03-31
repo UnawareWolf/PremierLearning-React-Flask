@@ -38,6 +38,8 @@ The [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main
 
 [Tutorial on keras (python, uses tensorflow)](https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/)
 
+[Installing tensorflow no cache](https://stackoverflow.com/questions/44335087/unable-to-install-tensorflow-memoryerror)
+
 ### React
 
 [Noughts and Crosses](https://reactjs.org/tutorial/tutorial.html)

@@ -56,9 +56,9 @@ class Runner:
 
         self.persist_players()
 
-        self.populate_squad()
+        # self.populate_squad()
 
-        print()
+        # print()
 
     def update_persisted_data_if_outdated(self):
         fantasy_json_from_api = self.get_request_json(FANTASY_API)
@@ -305,7 +305,7 @@ class Runner:
         return future_predictions
     
     def persist_players(self):
-        db_handler = DB_Handler('../database')
+        db_handler = DB_Handler()
         db_handler.init_db()
         db_handler.persist_players(self.current_season.players)
         db_handler.connection.commit()
