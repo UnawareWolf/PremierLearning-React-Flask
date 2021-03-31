@@ -5,11 +5,10 @@ import json
 
 class OptimiseRunner:
 
-    def __init__(self, manager_id, username, password):
+    def __init__(self, username, password):
         self.nope = None
         self.squad = None
         self.transfers = None
-        self.manager_id = manager_id
         self.username = username
         self.password = password
         
@@ -23,7 +22,7 @@ class OptimiseRunner:
         db_handler.close_connection()
 
         self.squad = Squad(players, elements_dict, 30)
-        self.squad.populate_by_log_in(self.manager_id, self.username, self.password)
+        self.squad.populate_by_log_in(self.username, self.password)
         self.transfers = self.squad.make_sensible_transfers()
     
     def get_transfers(self):

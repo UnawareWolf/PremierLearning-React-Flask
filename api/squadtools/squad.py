@@ -6,7 +6,7 @@ from pulp import LpMaximize, LpProblem, lpSum, LpVariable, PULP_CBC_CMD
 
 from premierlearning import Transfer
 from premierlearning import RawPlayer
-from .logged_in_action_performer import pick_team, get_player_ids, make_transfers
+from .logged_in_action_performer import pick_team, get_player_ids, make_transfers, get_manager_id
 
 MANAGER_API = 'https://fantasy.premierleague.com/api/entry/%i/'
 MANAGER_PICKS_API = 'https://fantasy.premierleague.com/api/entry/%i/event/%i/picks/'
@@ -45,13 +45,13 @@ class Squad:
         self.username = None
         self.password = None
 
-    def populate_by_log_in(self, manager_id, username, password):
+    def populate_by_log_in(self, username, password):
         self.username = username
         self.password = password
-        self.manager_id = manager_id
-        manager_json = requests.get(MANAGER_API % manager_id).json()
+        self.manager_id = get_manager_id(username, password)
+        manager_json = requests.get(MANAGER_API % self.manager_id).json()
 
-        manager_picks_json = get_player_ids(self.manager_id, self.username, self.password).json()
+        manager_picks_json = get_player_ids(self.username, self.password).json()
 
         try:
             self.budget = manager_json['last_deadline_value'] + manager_json['last_deadline_bank']

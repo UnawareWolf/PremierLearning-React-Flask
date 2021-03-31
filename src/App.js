@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -28,7 +28,8 @@ function App() {
   const [transfers, setTransfers] = useState([]);
   const [password, setPassword] = useState();
   const [email, setEmail] = useState();
-  const [managerID, setManagerID] = useState();
+
+  // let transferData;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,7 +40,6 @@ function App() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        'manager_id': managerID,
         'username': email,
         'password': password
       })
@@ -48,6 +48,7 @@ function App() {
       //   console.log(data.transfers[transfer]);
       // }
       setTransfers(data.transfers);
+      // transferData = data.transfers;
       // setTransfers(data.transfers);
       // console.log(JSON.stringify(data.transfers))
 		});
@@ -74,7 +75,6 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <form onSubmit={handleSubmit}>
-          <div><input type="number" name="manager id" placeholder="manager id" onChange={event => setManagerID(event.target.value)} value={managerID} /></div>
           <div><input type="text" name="email" placeholder="email" onChange={event => setEmail(event.target.value)} value={email} /></div>
           <div><input type="password" name="password" placeholder="password" onChange={event => setPassword(event.target.value)} value={password} /></div>
           <div><button type="submit">Submit</button></div>
