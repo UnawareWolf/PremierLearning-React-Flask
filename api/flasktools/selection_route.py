@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, request
 from flask_cors import CORS
 from squadtools import OptimiseRunner
@@ -5,8 +6,10 @@ from squadtools import OptimiseRunner
 bp = Blueprint('time', __name__, url_prefix='/api/time')
 CORS(bp)
 
-@bp.route('/', methods=(['POST']))
+@bp.route('/', methods=(['GET', 'POST']))
 def time_test():
+    if request.method == 'GET':
+        return {'time': datetime.now()}
     print(request.method)
     request_data = request.get_json()
     # print('username: %s, password: %s' % (username, password))
