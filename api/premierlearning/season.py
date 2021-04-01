@@ -19,6 +19,16 @@ PAST_SEASON_RAW_DATA_LOCATION = 'data/season_%i_%i/raw.json'
 LAST_SEASON_TEAM_STANDINGS_LOCATION = 'data/season_%i_%i/last_season_team_standings.json'
 
 
+def read_json(file_path):
+        with open(file_path) as file:
+            return json.load(file)
+
+
+def get_next_gameweek():
+        fantasy_json = read_json(FANTASY_JSON_FILE_LOCATION)
+        return next(event['id'] for event in fantasy_json['events'] if event['is_next'])
+
+
 class Season(ABC):
 
     def __init__(self):
@@ -41,7 +51,7 @@ class Season(ABC):
         self.populate_player_code_dict()
 
     def set_up_element_type_dict(self):
-        self.element_type_dict = self.read_json(FANTASY_JSON_FILE_LOCATION)['element_types']
+        self.element_type_dict = read_json(FANTASY_JSON_FILE_LOCATION)['element_types']
 
     # def calculate_player_points_over_next_5_weeks(self):
     #     for player in self.players:
@@ -54,7 +64,7 @@ class Season(ABC):
         self.players.sort(key=lambda player_to_sort: player_to_sort.points_over_next_5_gameweeks, reverse=True)
 
     def populate_last_season_team_standings(self):
-        self.last_season_team_standings = self.read_json(LAST_SEASON_TEAM_STANDINGS_LOCATION % self.years)
+        self.last_season_team_standings = read_json(LAST_SEASON_TEAM_STANDINGS_LOCATION % self.years)
 
     def populate_player_code_dict(self):
         for player in self.players:
@@ -72,11 +82,6 @@ class Season(ABC):
     def populate_teams(self):
         pass
 
-    @staticmethod
-    def read_json(file_path):
-        with open(file_path) as file:
-            return json.load(file)
-
 
 class CurrentSeason(Season):
 
@@ -88,17 +93,17 @@ class CurrentSeason(Season):
         self.set_up_season()
 
     def populate_fixtures_json(self):
-        self.fixtures_json = self.read_json(FIXTURES_JSON_FILE_LOCATION)
+        self.fixtures_json = read_json(FIXTURES_JSON_FILE_LOCATION)
 
     def populate_players(self):
         for element in self.fantasy_json['elements']:
             player_file_path = PLAYER_JSON_FILE_LOCATION % element['id']
-            player_json = self.read_json(player_file_path)
+            player_json = read_json(player_file_path)
             self.players.append(Player(self.fantasy_json, element, player_json, self.teams, self.current_gameweek))
         random.shuffle(self.players)
 
     def populate_teams(self):
-        self.fantasy_json = self.read_json(FANTASY_JSON_FILE_LOCATION)
+        self.fantasy_json = read_json(FANTASY_JSON_FILE_LOCATION)
         self.next_gameweek = next(event['id'] for event in self.fantasy_json['events'] if event['is_next'])
         self.current_gameweek = next(event['id'] for event in self.fantasy_json['events'] if event['is_current'])
 
@@ -132,7 +137,7 @@ class PastSeason(Season):
 
     def populate_teams(self):
         if self.years[0] == 18:
-            raw_json = self.read_json(PAST_SEASON_RAW_DATA_LOCATION % self.years)
+            raw_json = read_json(PAST_SEASON_RAW_DATA_LOCATION % self.years)
             teams_dict = raw_json['teams']
         else:
             teams_dict = self.read_csv(PAST_SEASON_TEAMS_CSV_LOCATION % self.years)

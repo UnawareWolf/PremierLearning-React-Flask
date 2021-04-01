@@ -2,11 +2,13 @@ import requests
 import itertools
 import math
 
+from abc import ABC
 from pulp import LpMaximize, LpProblem, lpSum, LpVariable, PULP_CBC_CMD
 
+from premierlearning import get_next_gameweek
 from premierlearning import Transfer
 from premierlearning import RawPlayer
-from .logged_in_action_performer import pick_team, get_player_ids, make_transfers, get_manager_id
+# from .logged_in_action_performer import pick_team, get_player_ids, make_transfers, get_manager_id
 
 MANAGER_API = 'https://fantasy.premierleague.com/api/entry/%i/'
 MANAGER_PICKS_API = 'https://fantasy.premierleague.com/api/entry/%i/event/%i/picks/'
@@ -16,69 +18,24 @@ BUDGET = 1000
 MAX_PLAYERS_PER_TEAM = 3
 
 
-class Squad:
+class AbstractSquad(ABC):
 
-    def __init__(self, players, element_types, next_gameweek):
+    def __init__(self, player_dict, element_types):
         self.squad = []
-        self.starters = []
-        self.bench = []
-        self.next_gameweek = next_gameweek
-        self.next_week_projected_points = 0
-        self.captain = None
-        self.vice_captain = None
+        self.next_gameweek = get_next_gameweek()
         self.element_types = element_types
-        self.player_dict = {}
+        self.player_dict = player_dict
         self.wrapped_player_dict = {}
         self.budget = BUDGET
         self.spent = 0
         self.free_transfers = 0
-        self.transfers_done = []
+        self.staged_transfers = []
         self.future_starting_teams = {}
         self.bank = 0
-        self.manager_id = 0
-
         self.bench_boost_gw = 0
         self.free_hit_gw = 0
 
-        self.populate_player_dict(players)
-        self.populate_wrapped_player_dict(players)
-        self.username = None
-        self.password = None
-
-    def populate_by_log_in(self, username, password):
-        self.username = username
-        self.password = password
-        self.manager_id = get_manager_id(username, password)
-        manager_json = requests.get(MANAGER_API % self.manager_id).json()
-
-        manager_picks_json = get_player_ids(self.username, self.password).json()
-
-        try:
-            self.budget = manager_json['last_deadline_value'] + manager_json['last_deadline_bank']
-            self.bank = manager_json['last_deadline_bank']
-        except:
-            pass
-
-        self.free_transfers = manager_picks_json['transfers']['limit']
-        if self.free_transfers is None:
-            self.free_transfers = 15
-
-        self.squad.clear()
-        squad_ids = []
-        for element in manager_picks_json['picks']:
-            squad_ids.append(element['element'])
-
-        self.populate_squad(squad_ids)
-
-        self.bank = manager_picks_json['transfers']['bank']
-        self.budget = self.bank
-
-        for element in manager_picks_json['picks']:
-            player_id = element['element']
-            wrapped_player = self.wrapped_player_dict[player_id]
-            wrapped_player.purchase_price = element['purchase_price']
-            wrapped_player.selling_price = element['selling_price']
-            self.budget += wrapped_player.selling_price
+        self.populate_wrapped_player_dict(self.player_dict)
 
     def populate_from_manager_id(self, manager_id):
         self.manager_id = manager_id
@@ -128,7 +85,7 @@ class Squad:
     def get_manager_free_transfers(manager_gameweeks):
         free_transfers = 0
         for gameweek in manager_gameweeks['current']:
-            free_transfers = Squad.get_free_transfers_next_week(free_transfers, gameweek['event_transfers'])
+            free_transfers = AbstractSquad.get_free_transfers_next_week(free_transfers, gameweek['event_transfers'])
         return free_transfers
 
     @staticmethod
@@ -146,13 +103,9 @@ class Squad:
 
         self.populate_squad(squad_ids)
 
-    def populate_player_dict(self, players):
-        for player in players:
-            self.player_dict[player.id] = player
-
     def populate_wrapped_player_dict(self, players):
-        for player in players:
-            self.wrapped_player_dict[player.id] = WrappedPlayer(player, player.current_cost)
+        for player_id, player in players.items():
+            self.wrapped_player_dict[player_id] = WrappedPlayer(player, player.current_cost)
 
     def get_optimised_squad_ids(self, gameweek_from, gameweek_to, allowed_transfers):
         squad_keys = set(player.id for player in self.squad)
@@ -242,13 +195,10 @@ class Squad:
         for var in model.variables():
             if var.value() == 1:
                 ids.append(int(var.name.split('_')[1]))
-                # ids.append(int(var.name[1:]))
         return ids
 
     def populate_squad(self, player_ids):
         self.squad.clear()
-        self.starters.clear()
-        self.bench.clear()
         self.spent = 0
 
         for player_id in player_ids:
@@ -262,7 +212,6 @@ class Squad:
 
     @staticmethod
     def get_bench_ids(player_ids, starter_ids):
-        # return list(player.id for player in self.squad if player.id not in starter_ids)
         return list(i for i in player_ids if i not in starter_ids)
 
     def populate_future_starting_teams(self, weeks_ahead):
@@ -332,32 +281,13 @@ class Squad:
 
         return suggested_transfers
 
-    # def make_transfers(self, transfer_count):
-    #     new_ids = self.get_optimised_squad_ids(self.next_gameweek, self.next_gameweek + 5, transfer_count)
-    #
-    #     squad_keys = set()
-    #     for player in self.squad:
-    #         squad_keys.add(player.id)
-    #
-    #     players_in = list(self.player_dict[i] for i in new_ids if i not in squad_keys)
-    #     players_in.sort(key=lambda player_: player_.position)
-    #     players_out = list(self.player_dict[i] for i in squad_keys if i not in new_ids)
-    #     players_out.sort(key=lambda player_: player_.position)
-    #
-    #     assert len(players_in) == len(players_out)
-    #
-    #     for i in range(len(players_in)):
-    #         self.transfers_done.append(Transfer(players_out[i], players_in[i]))
-    #
-    #     self.populate_squad(new_ids)
-
     def make_sensible_transfers(self):
         best_five_transfers = self.get_suggested_transfers(5)
         strategy = None
         if len(best_five_transfers) > 0:
             no_hit_strategy = self.get_transfer_strategy(self.free_transfers, best_five_transfers)
-            one_hit_strategy = self.get_transfer_strategy(self.free_transfers + 1, best_five_transfers)
-            two_hit_strategy = self.get_transfer_strategy(self.free_transfers + 2, best_five_transfers)
+            # one_hit_strategy = self.get_transfer_strategy(self.free_transfers + 1, best_five_transfers)
+            # two_hit_strategy = self.get_transfer_strategy(self.free_transfers + 2, best_five_transfers)
 
             # a = self.get_accurate_points_for_strategy(no_hit_strategy)
             # b = self.get_accurate_points_for_strategy(one_hit_strategy)
@@ -420,7 +350,6 @@ class Squad:
                 transfer_dict_list.append(transfer_dict)
         transfer_dict_list.sort(key=lambda transfer_plan: transfer_plan['points'], reverse=True)
         return transfer_dict_list[0]
-        # print()
 
     @staticmethod
     def static_do_transfers(squad, transfers):
@@ -452,7 +381,7 @@ class Squad:
 
     @staticmethod
     def squad_is_valid(players):
-        return Squad.team_numbers_are_valid(players)
+        return AbstractSquad.team_numbers_are_valid(players)
 
     def get_points_from_players_and_transfer_strategy(self, players, transfer_scheme, transfer_tuple):
         gameweek = self.next_gameweek
@@ -477,16 +406,16 @@ class Squad:
             gameweek += 1
         return points
 
-    def make_transfers(self, max_transfers):
+    def stage_transfers(self, max_transfers):
         suggested_transfers = self.get_suggested_transfers(max_transfers)
         for transfer in suggested_transfers:
-            self.make_transfer(transfer)
+            self.stage_transfer(transfer)
 
-    def make_transfer(self, transfer):
+    def stage_transfer(self, transfer):
         squad_keys = self.get_player_ids()
         squad_keys.remove(transfer.player_out.id)
         squad_keys.append(transfer.player_in.id)
-        self.transfers_done.append(transfer)
+        self.staged_transfers.append(transfer)
         self.populate_squad(squad_keys)
 
     def get_player_ids(self):
@@ -495,48 +424,6 @@ class Squad:
     @staticmethod
     def transfers_made(old_squad_ids, new_squad_ids):
         return sum(list(1 for _ in new_squad_ids if _ not in old_squad_ids))
-
-    def pick_team_request_format(self):
-        starting_team = self.future_starting_teams[self.next_gameweek]
-        captain = starting_team.captain
-        vice_captain = starting_team.vice_captain
-
-        picks = {}
-        placement = 1
-        for player in starting_team.players:
-            if player.id not in picks:
-                picks[player.id] = player.format_as_request_pick(placement, False, False)
-            placement += 1
-
-        picks[captain.id]['is_captain'] = True
-        picks[vice_captain.id]['is_vice_captain'] = True
-
-        for player in starting_team.bench:
-            picks[player.id] = player.format_as_request_pick(placement, False, False)
-            placement += 1
-
-        return {'chip': None, 'picks': list(picks.values())}
-
-    def log_in_and_pick_team(self):
-        request_payload = self.pick_team_request_format()
-        pick_team(self.manager_id, request_payload, self.username, self.password)
-
-    def format_transfer_requests(self):
-        request_payload = {
-            'chips': None,
-            'entry': self.manager_id,
-            'event': self.next_gameweek,
-            'transfers': []
-        }
-        for transfer in self.transfers_done:
-            request_payload['transfers'].append(transfer.format_as_request())
-
-        return request_payload
-
-    def log_in_and_make_transfers(self):
-        request_payload = self.format_transfer_requests()
-        make_transfers(request_payload, self.username, self.password)
-        self.transfers_done.clear()
 
 
 class WrappedPlayer:

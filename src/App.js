@@ -1,10 +1,10 @@
-import React, { useState, } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 function Transfer(transfer) {
   return (
-    <div>{transfer}</div>
+    <div>{JSON.stringify(transfer)}</div>
   );
 }
 
@@ -22,18 +22,14 @@ function Transfers(transfers) {
 
 function App() {
 
-  // const [transfers, handleChange] = useTransfers({0: ""});
-  // const [transfersMap, setTransfersMap] = useState({gameweek: 0, transfer})
-	// const [transfersList, setTransfersList] = useState([transfersMap]);
-  const [transfers, setTransfers] = useState([]);
+  const [transfers, setTransfers] = useState();
   const [password, setPassword] = useState();
   const [email, setEmail] = useState();
 
-  // let transferData;
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch('/api/api/time/', {
+    // useEffect(() => {
+    fetch('/api/time/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -44,14 +40,9 @@ function App() {
         'password': password
       })
     }).then(res => res.json()).then(data => {
-      // for (let transfer in data.transfers) {
-      //   console.log(data.transfers[transfer]);
-      // }
-      setTransfers(data.transfers);
-      // transferData = data.transfers;
-      // setTransfers(data.transfers);
-      // console.log(JSON.stringify(data.transfers))
-		});
+      setTransfers((data.transfers));
+    });
+    // });
   }
 
 	// useEffect(() => {

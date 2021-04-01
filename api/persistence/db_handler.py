@@ -26,7 +26,6 @@ def close_connection(exception):
 class DB_Handler:
 
     def __init__(self):
-        # self.connection = sqlite3.connect(DATABASE)
         self.connection = get_db()
         self.cursor = self.connection.cursor()
     
@@ -92,7 +91,7 @@ class DB_Handler:
         return matches
 
     def get_players(self):
-        players = []
+        players = {}
         matches_dict = self.get_matches()
         future_matches_dict = self.get_future_matches()
         for db_player in self.cursor.execute('select id, first_name, surname, team_id, current_cost, position from players').fetchall():
@@ -105,6 +104,6 @@ class DB_Handler:
             player.position = db_player[5]
             player.matches = matches_dict[player.id]
             player.future_matches = future_matches_dict[player.id]
-            players.append(player)
+            players[player.id] = player
         
         return players

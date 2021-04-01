@@ -9,7 +9,6 @@ from keras.layers import Dense
 from sklearn import linear_model
 from .season import *
 from .formatted_match_data import FormattedMatchData
-from squadtools import Squad
 from persistence import DB_Handler
 
 FANTASY_JSON_FILE_LOCATION = 'data/season_20_21/fantasy.json'
@@ -314,100 +313,6 @@ class Runner:
     def dump_element_types(self):
         with open('element_types.json', 'w') as f:
             json.dump(self.current_season.element_type_dict, f)
-
-    def populate_squad(self):
-        print('Populating squad...')
-        self.squad = Squad(self.current_season.players, self.current_season.element_type_dict,
-                           self.current_season.next_gameweek)
-        self.squad.build_from_scratch()
-        print('Squad finalised.')
-        print()
-
-        captain = None
-        best_week_score = 0
-        for player in self.squad.squad:
-            print(player)
-            if player.future_matches[0].points > best_week_score:
-                captain = player
-                best_week_score = player.future_matches[0].points
-
-        if captain is not None:
-            print()
-            print(str(captain) + ' predictions:')
-            match_count = 0
-            for match in captain.future_matches:
-                print(match)
-                if match_count == 5:
-                    break
-                match_count += 1
-
-        print('spent %f' % self.squad.spent)
-
-        # riveta_thins = Squad(self.current_season.players, self.current_season.element_type_dict,
-        #                      self.current_season.next_gameweek)
-        # riveta_thins.bench_boost_gw = 19
-        # riveta_thins.free_hit_gw = 18
-        # riveta_thins.populate_from_manager_id(7414114, True)
-        #
-        # riveta_thins.log_in_and_pick_team()
-
-        bobbys_ballers = Squad(self.current_season.players, self.current_season.element_type_dict,
-                               self.current_season.next_gameweek)
-        # bobbys_ballers.bench_boost_gw = 26
-        # bobbys_ballers.wild
-        # bobbys_ballers.free_hit_gw = 18
-        # bobbys_ballers.populate_from_manager_id(7753805)
-        # bobbys_ballers.populate_by_log_in(7753805)
-        bobbys_ballers.populate_by_log_in(7414114)
-        bobbys_ballers.make_sensible_transfers()
-        # bobbys_ballers.make_transfers(1)
-        # bobbys_ballers.make_transfers(15)
-        # bobbys_ballers.log_in_and_make_transfers()
-        # bobbys_ballers.log_in_and_pick_team()
-
-        borbor = Squad(self.current_season.players, self.current_season.element_type_dict,
-                               self.current_season.next_gameweek)
-        borbor.free_hit_gw = 18
-        borbor.populate_from_manager_id(7482830)
-        borbor.make_sensible_transfers()
-
-
-        # print(riveta_thins.future_starting_teams[16].captain)
-
-        # riveta_transfers = Squad(self.current_season.players, self.current_season.element_type_dict,
-        #                          self.current_season.next_gameweek)
-        # riveta_transfers.bench_boost_gw = 19
-        # # riveta_transfers.free_hit_gw = 18
-        # riveta_transfers.populate_from_manager_id(7414114)
-        # # # riveta_transfers.make_transfers_2()
-        # riveta_transfers.make_transfers(15)
-        #
-        # # riveta_thins.make_transfers_2()
-        #
-        # riv_2 = Squad(self.current_season.players, self.current_season.element_type_dict,
-        #               self.current_season.next_gameweek)
-        # riv_2.populate_squad([12, 110, 232, 277, 470, 141, 37, 390, 370, 388, 506, 224, 563, 267, 364])
-        #
-        # riv_2.make_transfers(1)
-        #
-        # awobabobob = Squad(self.current_season.players, self.current_season.element_type_dict,
-        #                    self.current_season.next_gameweek)
-        # awobabobob.populate_from_manager_id(1206979)
-        # # awobabobob.make_transfers_2()
-        # # awobabobob.make_transfers(15)
-        #
-        # the_natural_sg27 = Squad(self.current_season.players, self.current_season.element_type_dict,
-        #                          self.current_season.next_gameweek)
-        # the_natural_sg27.populate_from_manager_id(2055984)
-        # # the_natural_sg27.make_transfers(5)
-        #
-        # bolt_utd = Squad(self.current_season.players, self.current_season.element_type_dict,
-        #                  self.current_season.next_gameweek)
-        # bolt_utd.populate_from_manager_id(4948666)
-        # bolt_utd.find_optimised_transfers()
-        # bolt_utd.make_transfers(5)
-
-        print()
 
     @staticmethod
     def get_last_event_checked_id(fantasy_json):
