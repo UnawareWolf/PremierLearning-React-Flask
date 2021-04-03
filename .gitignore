@@ -21,3 +21,17 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# flask
+venv/
+__pycache__/
+
+# yarn
+.yarn/
+.yarnrc.yml
+
+# vscode
+.vscode/
+
+# database
+*/fantasy.db
