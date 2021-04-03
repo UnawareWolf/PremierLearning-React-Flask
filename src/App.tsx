@@ -28,7 +28,7 @@ function App() {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    fetch('/api/api/time/', {
+    fetch('/api/time/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
