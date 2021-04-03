@@ -1,46 +1,83 @@
-# Getting Started with Create React App
+# Premier Learning
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 1 The Project
 
-## Available Scripts
+### 1.1 [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api)
 
-In the project directory, you can run:
+The [`api`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api) directory contains python backend code and player data.
 
-### `yarn start`
+#### 1.1.1 [`flasktools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/flasktools)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This python module creates the flask app and attaches blueprints for url routes. The routes give access to [`squadtools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/squadtools) to get transfer suggestions and [`premierlearning`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/premierlearning) for admin to re-learn the model.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+#### 1.1.2 [`persistence`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/persistence)
 
-### `yarn test`
+This python module handles interactions with the database; it inserts players created from [`premierlearning`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/premierlearning) and also extracts players for squad optimising.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+#### 1.1.3 [`premierlearning`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/premierlearning)
 
-### `yarn build`
+This python module updates player data in [`data`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/data) with calls to the fantasy premier league api. It uses this data to initialise player objects which are inputs to the tensor flow machine learning model that predicts future player scores. These predictions are attached to the original player objects and saved to the database via [`persistence`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/persistence).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### 1.1.4 [`squadtools`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/squadtools)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This python module selects learnt players from the database via [`persistence`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/persistence), logs in to a user's fantasy team with a call to the fantasy premier league api and uses a pulp linear-optimisation model to offer transfer suggestions.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### 1.1.5 [`data`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/api/data)
 
-### `yarn eject`
+This directory holds player data from the fantasy premier league api in csv and json files.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 1.2 [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/src)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The [`src`](https://github.com/UnawareWolf/PremierLearning-React-Flask/tree/main/src) directory contains front end react code which calls the python api and renders results.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 2 Tutorials
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Machine Learning
 
-## Learn More
+[3Blue1Brown YouTube series on neural networks and deep learning](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+[Tutorial on keras (python, uses tensorflow)](https://machinelearningmastery.com/tutorial-first-neural-network-python-keras/)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+[Installing tensorflow no cache](https://stackoverflow.com/questions/44335087/unable-to-install-tensorflow-memoryerror)
+
+### React
+
+[Noughts and Crosses](https://reactjs.org/tutorial/tutorial.html)
+
+[Async, Await Fireship YouTube video](https://www.youtube.com/watch?v=vn3tm0quoqE)
+
+[Sending Requests DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-call-web-apis-with-the-useeffect-hook-in-react)
+
+### TypeScript
+
+[TypeScript React Ben Awad YouTube video](https://www.youtube.com/watch?v=Z5iWr6Srsj8)
+
+### Flask
+
+[Blueprints](https://flask.palletsprojects.com/en/1.1.x/blueprints/)
+
+[SQLite3](https://flask.palletsprojects.com/en/1.1.x/patterns/sqlite3/)
+
+[Application Context](https://flask.palletsprojects.com/en/1.1.x/appcontext/)
+
+[Flask CORS](https://flask-cors.readthedocs.io/en/latest/)
+
+[Receiving Requests](https://www.digitalocean.com/community/tutorials/processing-incoming-request-data-in-flask)
+
+### SQLite
+
+[SQLite3 Python DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-sqlite3-module-in-python-3)
+
+### Server
+
+[Miguel Grinberg blog: react and flask on localhost](https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project)
+
+[NGINX Fireship YouTube video](https://www.youtube.com/watch?v=JKxlsvZXG7c)
+
+[Miguel Grinberg blog: react and flask on server using NGINX](https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project)
+
+[Linode: securing your server](https://www.linode.com/docs/guides/securing-your-server/)
+
+[HTTPS setup with Let's Encrypt/Certbot](https://letsencrypt.org/getting-started/)
+
+[HTTPS more detailed instructions with DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04)
