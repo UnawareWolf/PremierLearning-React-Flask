@@ -54,10 +54,10 @@ function App() {
 
    return (
       <div className="App">
-         <Tabs setSelected={setTabCallback} tabs={tabs} />
-         {tabSelected == 'team' && <Team />}
+         <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />
          <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
+            {tabSelected == 'team' && <Team />}
             {/* <form onSubmit={handleSubmit}>
                <div><input type="text" name="email" placeholder="email" onChange={event => setEmail(event.target.value)} value={email} /></div>
                <div><input type="password" name="password" placeholder="password" onChange={event => setPassword(event.target.value)} value={password} /></div>

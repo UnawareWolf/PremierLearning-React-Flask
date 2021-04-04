@@ -1,3 +1,11 @@
 ul#Tabs li {
     display: inline;
 }
+
+button {
+    opacity: 0.6;
+}
+
+button.selected {
+    opacity: 1;
+}
