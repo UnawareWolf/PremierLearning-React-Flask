@@ -26,6 +26,12 @@ class Transfer:
 
     def __str__(self):
         return str(self.player_out) + " -> " + str(self.player_in)
+    
+    def format_as_json(self):
+        return {
+            'id_out': self.player_out.id,
+            'id_in': self.player_in.id
+        }
 
     def format_as_request(self):
         return {
