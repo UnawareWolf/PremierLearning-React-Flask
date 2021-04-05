@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FC } from 'react';
+import { FC } from 'react';
 import { PlayerMap, PlayerFC, } from './Player';
 
 interface Transfer {

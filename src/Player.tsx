@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { createContext, FC } from 'react';
 
 interface Match {
    minutes: number,
@@ -21,6 +21,7 @@ export interface PlayerMap {
    [id: number]: Player
 }
 
+export const PlayerMapContext = createContext<PlayerMap | null>(null);
 
 interface PlayerProps {
    player: Player
@@ -38,7 +39,7 @@ interface PlayerListProps {
    players: PlayerMap
 }
 
-const PlayerList: FC<PlayerListProps> = ({ players }) => {
+export const PlayerList: FC<PlayerListProps> = ({ players }) => {
    let playerRenders = [];
    for (let i in players) {
       if (i in players) {

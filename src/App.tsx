@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
-import { PlayerMap } from './Player';
+import { PlayerMap, PlayerMapContext } from './Player';
 import {Team} from './Team';
 import { Tabs } from './Tabs';
 import logo from './logo.svg';
 import './App.css';
-
-export type TabCallback = (tab: string) => void;
+import { Login, UserContext, User, defaultUser } from './Login';
+import {Default} from './Default';
 
 interface PlayersState {
    players: PlayerMap | null,
@@ -16,9 +16,14 @@ function App() {
 
    const [tabSelected, setTabSelected] = useState<string>('default');
    const [{players, loading}, setPlayers] = useState<PlayersState>({players: null, loading: true});
-   // const [transfers, setTransfers] = useState<TransferMap>();
-   // const [password, setPassword] = useState('');
-   // const [email, setEmail] = useState('');
+   const [user, setUser] = useState<User>(defaultUser);
+
+   const setUserCallback = useCallback(
+      user => {
+         setUser(user);
+      },
+      [setUser]
+   );
 
    const setTabCallback = useCallback(
       tab => {
@@ -36,15 +41,21 @@ function App() {
       });
    }, []);
 
-   const tabs = ['default', 'team', 'about'];
+   const tabs = ['default', 'team', 'about', 'login'];
 
    return (
       <div className="App">
          <header className="App-header">
-            <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />
             <img src={logo} className="App-logo" alt="logo" />
             {loading && 'loading'}
-            {tabSelected == 'team' && <Team players={players} />}
+            <UserContext.Provider value={user}>
+               <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />
+               <PlayerMapContext.Provider value={players}>
+                  {tabSelected === 'team' && <Team />}
+                  {tabSelected === 'login' && <Login setUser={setUserCallback} />}
+                  {tabSelected === 'default' && <Default />}
+               </PlayerMapContext.Provider>
+            </UserContext.Provider>
          </header>
       </div>
    );
