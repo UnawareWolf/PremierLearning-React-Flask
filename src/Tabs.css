@@ -1,8 +1,18 @@
 button.tab {
-    float: left;
+    /* background-color: #1d2433; */
+    background-color: #0a437a;
     opacity: 0.6;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    border: 0px;
+    padding: 8px 16px;
+    border-radius: 12px 12px 0px 0px;
 }
 
 button.selected {
+    background-color: #0a437a;
     opacity: 1;
 }
