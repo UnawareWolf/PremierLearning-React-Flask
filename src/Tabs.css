@@ -1,8 +1,5 @@
-ul#Tabs li {
-    display: inline;
-}
-
-button.unselected {
+button.tab {
+    float: left;
     opacity: 0.6;
 }
 
