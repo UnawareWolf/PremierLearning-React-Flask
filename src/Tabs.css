@@ -2,7 +2,7 @@ ul#Tabs li {
     display: inline;
 }
 
-button {
+button.unselected {
     opacity: 0.6;
 }
 

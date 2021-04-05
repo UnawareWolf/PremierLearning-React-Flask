@@ -1,15 +1,25 @@
 import { FC, useState } from 'react';
-import {TransferMap} from './Transfer';
+import { PlayerMap } from './Player';
+import { TransferMap, TransferList } from './Transfer';
 
+interface TeamProps {
+   players: PlayerMap | null
+}
 
-export const Team: FC = () => {
+interface TransfersState {
+   transfers: TransferMap | null,
+   loading: boolean
+}
 
-   const [transfers, setTransfers] = useState<TransferMap>();
+export const Team: FC<TeamProps> = ({ players }) => {
+   console.log('render team page');
+   const [{ transfers, loading }, setTransfers] = useState<TransfersState>({ transfers: null, loading: false });
    const [password, setPassword] = useState('');
    const [email, setEmail] = useState('');
-   
+
    const handleSubmit = (e: any) => {
       e.preventDefault();
+      setTransfers(state => ({ transfers: state.transfers, loading: true}));
       fetch('/api/optimise/login', {
          method: 'POST',
          headers: {
@@ -21,12 +31,18 @@ export const Team: FC = () => {
             'password': password
          })
       }).then(res => res.json()).then(data => {
-         setTransfers(data.transfers);
+         setTransfers({ transfers: data.transfers, loading: false});
       });
    }
-   return (<form onSubmit={handleSubmit}>
-      <div><input type="text" name="email" placeholder="email" onChange={event => setEmail(event.target.value)} value={email} /></div>
-      <div><input type="password" name="password" placeholder="password" onChange={event => setPassword(event.target.value)} value={password} /></div>
-      <div><button type="submit">Submit</button></div>
-   </form>);
+   return (
+      <div>
+         <form onSubmit={handleSubmit}>
+            <div><input type="text" name="email" placeholder="email" onChange={event => setEmail(event.target.value)} value={email} /></div>
+            <div><input type="password" name="password" placeholder="password" onChange={event => setPassword(event.target.value)} value={password} /></div>
+            <div><button type="submit">Submit</button></div>
+         </form>
+         {loading && 'loading'}
+         {players != null && transfers != null && <TransferList players={players} transfers={transfers} />}
+      </div>
+   );
 }

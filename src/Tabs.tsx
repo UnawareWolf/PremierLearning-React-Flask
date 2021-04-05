@@ -1,4 +1,4 @@
-import { FC, useState, ReactElement } from 'react';
+import { FC } from 'react';
 import { TabCallback } from './App';
 import './Tabs.css';
 
@@ -9,12 +9,13 @@ type TabsProps = {
 }
 
 export const Tabs: FC<TabsProps> = ({ selected, tabs, setSelected }) => {
+   console.log('render tabs');
    return (
       <div>
          <ul id='Tabs'>
             {tabs.map((tab) => (
                <li>
-                  <button className={tab == selected ? 'selected' : ''} onClick={() => setSelected(tab)} >
+                  <button className={tab == selected ? 'selected' : 'unselected'} onClick={() => setSelected(tab)} >
                      {tab}
                   </button>
                </li>
