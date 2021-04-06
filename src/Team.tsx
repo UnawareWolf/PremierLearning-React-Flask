@@ -25,7 +25,7 @@ export const Team: FC = () => {
    }
    return (
       <div>
-         {user.loggedIn && <button onClick={handleSubmit}>Get Transfer Suggestions</button>}
+         {user.loggedIn && <button className='general' onClick={handleSubmit}>Get Transfer Suggestions</button>}
          {loading && 'loading'}
          {players != null && transfers != null && <TransferList players={players} transfers={transfers} />}
       </div>

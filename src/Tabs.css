@@ -1,9 +1,21 @@
+div.tabWrapper {
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+}
+
 button.tab {
-    /* background-color: #1d2433; */
-    background-color: #0a437a;
-    opacity: 0.6;
+    background-color: #1d2433;
+    /* background-color: #0a437a; */
+    /* opacity: 0.6; */
+    /* position: absolute; */
+    /* bottom: 0%; */
+    /* bottom: 20%; */
+    /*left: 0; */
+    /* align-items: left; */
     cursor: pointer;
     font-size: 16px;
+    color: white;
     display: inline-block;
     text-decoration: none;
     text-align: center;

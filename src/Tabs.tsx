@@ -12,7 +12,7 @@ type TabsProps = {
 export const Tabs: FC<TabsProps> = ({ selected, tabs, setSelected }) => {
    console.log('render tabs');
    return (
-      <div>
+      <div className={'tabWrapper'} >
          {tabs.map((tab) => (
          <button className={tab === selected ? 'tab selected' : 'tab'} onClick={() => setSelected(tab)} >
             {tab}

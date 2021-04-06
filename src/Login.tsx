@@ -12,10 +12,10 @@ export const defaultUser: User = {
 
 export const UserContext = createContext<User>(defaultUser);
 
-type LoginCallback = (user: User) => void;
+type SetUserCallback = (user: User) => void;
 
 interface LoginProps {
-   setUser: LoginCallback
+   setUser: SetUserCallback
 }
 
 export const Login: FC<LoginProps> = ({ setUser }) => {
@@ -23,22 +23,32 @@ export const Login: FC<LoginProps> = ({ setUser }) => {
 
    return (
       <div>
-         {user.loggedIn ? <Me teamName={user.name} /> : <LoginForm setUser={setUser} />}
+         {user.loggedIn ? <Me teamName={user.name} setUser={setUser} /> : <LoginForm setUser={setUser} />}
       </div>
    );
 }
 
 interface MeProps {
-   teamName: string
+   teamName: string,
+   setUser: SetUserCallback
 }
 
-const Me: FC<MeProps> = ({ teamName }) => {
+const Me: FC<MeProps> = ({ teamName, setUser }) => {
+   const handleLogout = (e: any) => {
+      // api request to logout of session
+      setUser({
+         name: '',
+         loggedIn: false
+      });
+      
+   }
+
    return (
       <div>
          <div>
             Logged in as: {teamName}
          </div>
-         <button>log out</button>
+         <button className='general' onClick={handleLogout}>log out</button>
       </div>
    );
 }
