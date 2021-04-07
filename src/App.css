@@ -21,16 +21,14 @@
   left: 0;
   right: 0;
   height: 15%;
+  width: 100%;
 }
 
 #bottom {
   position: absolute;
   top: 15%;
-  left: 0;
-}
-#bottomBody {
-  position: relative;
-  text-align: left;
+  text-align: center;
+  width: 100%;
 }
 
 button.general {

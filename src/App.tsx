@@ -44,21 +44,19 @@ function App() {
 
    return (
       <div className="App">
-         
+
          <UserContext.Provider value={user}>
             <div id='top'>
                {user.loggedIn && <div id='userStamp'>{user.name}</div>}
                <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />
             </div>
             <div id='bottom'>
-               <div id='bottomBody'>
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
                   {tabSelected === 'team' && <Team />}
                   {tabSelected === 'login' && <Login setUser={setUserCallback} />}
                   {tabSelected === 'default' && <Default />}
                </PlayerMapContext.Provider>
-               </div>
             </div>
          </UserContext.Provider>
       </div>
