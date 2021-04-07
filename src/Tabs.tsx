@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import './Tabs.css';
+import './Tabs.scss';
 
 type TabCallback = (tab: string) => void;
 

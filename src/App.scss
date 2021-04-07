@@ -1,0 +1,53 @@
+@import 'common.scss';
+
+.App {
+    text-align: center;
+    color: white;
+    font-size: calc(10px + 2vmin);
+  }
+  
+  #userStamp {
+    position: relative;
+    /* right: 100%; */
+    text-align: end;
+    padding: 6px;
+    color: $highlightColor;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  #top {
+    top: 0;
+    background: $secondaryColor;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 15%;
+    width: 100%;
+  }
+  
+  #bottom {
+    position: absolute;
+    top: 15%;
+    text-align: center;
+    width: 100%;
+  }
+  
+  button.general {
+    margin: 8px;
+    background-color: $darkColor;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    border: 0px;
+    padding: 8px 16px;
+    border-radius: 12px 12px 12px 12px;
+    outline: none;
+  }
+  
+  button.general:hover {
+    background-color: $primaryColor;
+  }

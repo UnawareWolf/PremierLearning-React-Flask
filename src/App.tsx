@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { PlayerMap, PlayerMapContext } from './Player';
 import { Team } from './Team';
 import { Tabs } from './Tabs';
-import './App.css';
+import './App.scss';
 import { Login, UserContext, User, defaultUser } from './Login';
 import { Default } from './Default';
 

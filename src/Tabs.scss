@@ -1,3 +1,5 @@
+@import 'common.scss';
+
 div.tabWrapper {
     position: absolute;
     bottom: 0;
@@ -5,7 +7,7 @@ div.tabWrapper {
 }
 
 button.tab {
-    background-color: #1d2433;
+    background-color: $darkColor;
     /* background-color: #0a437a; */
     /* opacity: 0.6; */
     /* position: absolute; */
@@ -22,9 +24,10 @@ button.tab {
     border: 0px;
     padding: 8px 16px;
     border-radius: 12px 12px 0px 0px;
+    outline: none;
 }
 
 button.selected {
-    background-color: #0a437a;
+    background-color: $primaryColor;
     opacity: 1;
 }

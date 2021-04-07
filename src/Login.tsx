@@ -88,7 +88,7 @@ const LoginForm: FC<LoginProps> = ({ setUser }) => {
          <form onSubmit={handleSubmit}>
             <div><input type="text" name="email" placeholder="email" onChange={event => setEmail(event.target.value)} value={email} /></div>
             <div><input type="password" name="password" placeholder="password" onChange={event => setPassword(event.target.value)} value={password} /></div>
-            <div><button type="submit">Log in</button></div>
+            <div><button className='general' type="submit">Log in</button></div>
          </form>
       </div>
    );
