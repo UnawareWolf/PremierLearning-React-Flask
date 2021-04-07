@@ -34,3 +34,9 @@ def login():
         session['username'] = request_data['username']
         session['password'] = request_data['password']
     return {'user': user}
+
+@bp.route('/teamids', methods=(['GET']))
+def get_team_ids():
+    optimise_runner = OptimiseRunner(session['username'], session['password'])
+    optimise_runner.populate_squad()
+    return {'teamIDs': optimise_runner.get_ids()}

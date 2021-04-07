@@ -14,16 +14,19 @@ export const UserContext = createContext<User>(defaultUser);
 
 type SetUserCallback = (user: User) => void;
 
+type SetTabCallback = (tab: string) => void;
+
 interface LoginProps {
-   setUser: SetUserCallback
+   setUser: SetUserCallback,
+   setTab: SetTabCallback
 }
 
-export const Login: FC<LoginProps> = ({ setUser }) => {
+export const Login: FC<LoginProps> = ({ setUser, setTab }) => {
    const user: User = useContext(UserContext);
 
    return (
       <div>
-         {user.loggedIn ? <Me teamName={user.name} setUser={setUser} /> : <LoginForm setUser={setUser} />}
+         {user.loggedIn ? <Me teamName={user.name} setUser={setUser} /> : <LoginForm setUser={setUser} setTab={setTab} />}
       </div>
    );
 }
@@ -53,7 +56,7 @@ const Me: FC<MeProps> = ({ teamName, setUser }) => {
    );
 }
 
-const LoginForm: FC<LoginProps> = ({ setUser }) => {
+const LoginForm: FC<LoginProps> = ({ setUser, setTab }) => {
    const [password, setPassword] = useState<string>('');
    const [email, setEmail] = useState<string>('');
    const [loginFail, setLoginFail] = useState<boolean>(false);
@@ -78,6 +81,7 @@ const LoginForm: FC<LoginProps> = ({ setUser }) => {
          }
          else {
             // set tab to 'team' or something
+            setTab('team');
          }
       });
    }

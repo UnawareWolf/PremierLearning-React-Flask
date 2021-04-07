@@ -54,7 +54,7 @@ function App() {
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
                   {tabSelected === 'team' && <Team />}
-                  {tabSelected === 'login' && <Login setUser={setUserCallback} />}
+                  {tabSelected === 'login' && <Login setUser={setUserCallback} setTab={setTabCallback} />}
                   {tabSelected === 'default' && <Default />}
                </PlayerMapContext.Provider>
             </div>

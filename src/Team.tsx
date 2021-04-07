@@ -1,6 +1,6 @@
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import { UserContext } from './Login';
-import { PlayerMapContext } from './Player';
+import { PlayerMapContext, PlayerFC } from './Player';
 import { TransferMap, TransferList } from './Transfer';
 
 interface TransfersState {
@@ -8,11 +8,25 @@ interface TransfersState {
    loading: boolean
 }
 
+interface TeamIDs {
+   ids: number[] | null
+}
+
 export const Team: FC = () => {
    console.log('render team page');
    const [{ transfers, loading }, setTransfers] = useState<TransfersState>({ transfers: null, loading: false });
+   const [teamIDs, setTeamIDs] = useState<TeamIDs>({ ids: null });
    const players = useContext(PlayerMapContext);
    const user = useContext(UserContext);
+
+   useEffect(() => {
+      fetch('/api/teamids', {
+         method: 'GET'
+      }).then(res => res.json()).then(data => {
+         console.log(data.teamIDs);
+         setTeamIDs({ ids: data.teamIDs });
+      });
+   }, [user]);
 
    const handleSubmit = (e: any) => {
       e.preventDefault();
@@ -26,6 +40,9 @@ export const Team: FC = () => {
    return (
       <div>
          {user.loggedIn && <button className='general' onClick={handleSubmit}>Get Transfer Suggestions</button>}
+         {players != null && teamIDs.ids != null && teamIDs.ids.map((id) => (
+            <PlayerFC player={players[id]} />
+         ))}
          {loading && 'loading'}
          {players != null && transfers != null && <TransferList players={players} transfers={transfers} />}
       </div>

@@ -12,9 +12,11 @@ class OptimiseRunner:
         self.csrftoken = None
         self.email = email
         self.password = password
-        
-    def run(self):
-        
+    
+    def get_ids(self):
+        return self.squad.get_player_ids()
+
+    def populate_squad(self):
         with open('data/element_types.json') as f_in:
             elements_dict = json.load(f_in)
 
@@ -23,6 +25,10 @@ class OptimiseRunner:
         db_handler.close_connection()
 
         self.squad = UserSquad(self.email, self.password, players, elements_dict)
+        
+    def run(self):
+        
+        self.populate_squad()
         self.transfers = self.squad.make_sensible_transfers()
     
     def get_transfers(self):
