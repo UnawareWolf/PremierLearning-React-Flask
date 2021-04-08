@@ -38,12 +38,11 @@ interface MeProps {
 
 const Me: FC<MeProps> = ({ teamName, setUser }) => {
    const handleLogout = (e: any) => {
-      // api request to logout of session
+      fetch('/api/logout', {method: 'GET'});
       setUser({
          name: '',
          loggedIn: false
       });
-      
    }
 
    return (
@@ -80,7 +79,6 @@ const LoginForm: FC<LoginProps> = ({ setUser, setTab }) => {
             setLoginFail(true);
          }
          else {
-            // set tab to 'team' or something
             setTab('team');
          }
       });

@@ -7,7 +7,7 @@ div.tabWrapper {
 }
 
 button.tab {
-    background-color: $darkColor;
+    background-color: $darkColour;
     /* background-color: #0a437a; */
     /* opacity: 0.6; */
     /* position: absolute; */
@@ -28,6 +28,6 @@ button.tab {
 }
 
 button.selected {
-    background-color: $primaryColor;
+    background-color: $primaryColour;
     opacity: 1;
 }

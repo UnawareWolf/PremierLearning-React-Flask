@@ -17,8 +17,8 @@ PLAYER_JSON_FILE_LOCATION = 'data/season_20_21/players/player_%i.json'
 FANTASY_API = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 FIXTURES_API = 'https://fantasy.premierleague.com/api/fixtures/'
 PLAYER_API = 'https://fantasy.premierleague.com/api/element-summary/%i/'
-QUICK_RUN = True
-ALWAYS_UPDATE = False
+QUICK_RUN = False
+ALWAYS_UPDATE = True
 
 
 class Runner:
