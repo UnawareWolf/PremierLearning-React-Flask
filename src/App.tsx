@@ -1,10 +1,51 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, createContext } from 'react';
 import { PlayerMap, PlayerMapContext } from './Player';
-import { Team } from './Team';
+import { TeamFC } from './Team';
 import { Tabs } from './Tabs';
 import './App.scss';
-import { Login, UserContext, User, defaultUser } from './Login';
+import { Login } from './Login';
 import { Default } from './Default';
+import { TransferMap } from './Transfer';
+
+
+export interface StructuredTeam {
+   starters: number[],
+   bench: number[],
+   captain: number,
+   vc: number
+}
+
+export interface TeamMap {
+   [gameweek: number]: StructuredTeam
+}
+
+export interface User {
+   name: string,
+   loggedIn: boolean
+}
+
+export interface UserTeam {
+   teamIDs: number[] | null,
+   suggestedTeams: TeamMap | null,
+   transfers: TransferMap | null,
+   loading: boolean
+}
+
+export const defaultUser: User = {
+   name: '',
+   loggedIn: false
+}
+
+export const defaultUserTeam: UserTeam = {
+   teamIDs: null,
+   suggestedTeams: null,
+   transfers: null,
+   loading: false
+}
+
+export const UserContext = createContext<User>(defaultUser);
+
+export type SetUserTeamCallback = (userteam: UserTeam) => void;
 
 interface PlayersState {
    players: PlayerMap | null,
@@ -16,6 +57,14 @@ function App() {
    const [tabSelected, setTabSelected] = useState<string>('default');
    const [{ players, loading }, setPlayers] = useState<PlayersState>({ players: null, loading: true });
    const [user, setUser] = useState<User>(defaultUser);
+   const [userTeam, setUserTeam] = useState<UserTeam>(defaultUserTeam);
+
+   const setUserTeamCallback = useCallback(
+      userTeam => {
+         setUserTeam(userTeam);
+      },
+      [setUserTeam]
+   )
 
    const setUserCallback = useCallback(
       user => {
@@ -47,14 +96,16 @@ function App() {
 
          <UserContext.Provider value={user}>
             <div id='top'>
-               {user.loggedIn && <div id='userStamp'>{user.name}</div>}
                <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />
+               {user.loggedIn && <div id='userStamp'>{user.name}</div>}
+               
             </div>
             <div id='bottom'>
+               {/* Note: Player point predictions are 100% guaranteed to be accurate.<br /><br /> */}
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
-                  {tabSelected === 'team' && <Team />}
-                  {tabSelected === 'login' && <Login setUser={setUserCallback} setTab={setTabCallback} />}
+                  {tabSelected === 'team' && <TeamFC userTeam={userTeam} setUserTeam={setUserTeamCallback} />}
+                  {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                   {tabSelected === 'default' && <Default />}
                </PlayerMapContext.Provider>
             </div>

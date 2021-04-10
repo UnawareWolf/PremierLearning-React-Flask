@@ -5,13 +5,12 @@ import json
 
 class OptimiseRunner:
 
-    def __init__(self, email, password):
+    def __init__(self, user_json):
         self.nope = None
         self.squad = None
         self.transfers = None
         self.csrftoken = None
-        self.email = email
-        self.password = password
+        self.user_json = user_json
     
     def get_ids(self):
         return self.squad.get_player_ids()
@@ -24,7 +23,7 @@ class OptimiseRunner:
         players = db_handler.get_player_objects()
         db_handler.close_connection()
 
-        self.squad = UserSquad(self.email, self.password, players, elements_dict)
+        self.squad = UserSquad(self.user_json, players, elements_dict)
         
     def run(self):
         
@@ -32,10 +31,6 @@ class OptimiseRunner:
         self.transfers = self.squad.make_sensible_transfers()
     
     def get_transfers(self):
-        # transfer_list = []
-        # for transfer in self.transfers['transfer_tuple']:
-        #     transfer_list.append(str(transfer))
-        # return transfer_list
         temp_gameweek = self.squad.next_gameweek
         transfer_index = 0
         transfers_list = []

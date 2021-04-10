@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, request, session
 from flask_cors import CORS
-from squadtools import OptimiseRunner, do_login
+from squadtools import OptimiseRunner, get_user_jsons
 from persistence import DB_Handler
 
 bp = Blueprint('selection', __name__, url_prefix='/api')
@@ -21,9 +21,11 @@ def get_all_players():
     return {'players': players}
 
 
-@bp.route('/optimise/login', methods=(['GET']))
+@bp.route('/optimise', methods=(['GET']))
 def optimise_by_login():
-    optimise_runner = OptimiseRunner(session['username'], session['password'])
+    if 'user_json' not in session:
+        return {'transfers': None}
+    optimise_runner = OptimiseRunner(session['user_json'])
     optimise_runner.run()
     return {'transfers': optimise_runner.get_transfers_json()}
 
@@ -31,26 +33,24 @@ def optimise_by_login():
 @bp.route('/login', methods=(['POST']))
 def login():
     request_data = request.get_json()
-    user = do_login(request_data['username'], request_data['password'])
-    if user['loggedIn']:
-        session['username'] = request_data['username']
-        session['password'] = request_data['password']
-        session['loggedIn'] = True
-    return {'user': user}
 
-
-@bp.route('/teamids', methods=(['GET']))
-def get_team_ids():
-    if 'loggedIn' not in session or not session['loggedIn']:
-        return {'teamIDs': []}
-    optimise_runner = OptimiseRunner(session['username'], session['password'])
-    optimise_runner.populate_squad()
-    return {'teamIDs': optimise_runner.get_ids()}
+    session['user_json'] = get_user_jsons(request_data['username'], request_data['password'])
+    print(session['user_json']['user'])
+    return {'user': session['user_json']['user']}
 
 
 @bp.route('/logout', methods=(['GET']))
 def logout():
-    session['username'] = ''
-    session['password'] = ''
-    session['loggedIn'] = False
+    session['user_json'] = {
+        'user': {
+            'name': '',
+            'loggedIn': False,
+            'teamIDs': []
+        },
+        'fpl_api': {
+            'manager_id': None,
+            'manager_json': None,
+            'picks': None
+        }
+    }
     return {}

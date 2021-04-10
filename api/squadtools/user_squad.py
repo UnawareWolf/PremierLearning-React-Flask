@@ -1,22 +1,22 @@
 import requests
 
-from .squad import AbstractSquad, MANAGER_API
-from .logged_in_action_performer import get_manager_id, get_player_ids, make_transfers
+from .squad import AbstractSquad
+from .logged_in_action_performer import make_transfers
 
 class UserSquad(AbstractSquad):
 
-    def __init__(self, email, password, players, element_types):
+    def __init__(self, user_json, players, element_types):
         super().__init__(players, element_types)
-        self.email = email
-        self.password = password
         # self.csrftoken = login_initial(email, password)
-        self.manager_id = get_manager_id(self.email, self.password)
+        self.manager_id = user_json['fpl_api']['manager_id']
+        self.user_json = user_json
         self.populate_by_log_in()
 
     def populate_by_log_in(self):
-        manager_json = requests.get(MANAGER_API % self.manager_id).json()
-
-        manager_picks_json = get_player_ids(self.email, self.password).json()
+        # manager_json = requests.get(MANAGER_API % self.manager_id).json()
+        manager_json = self.user_json['fpl_api']['manager_json']
+        # manager_picks_json = get_player_ids(self.email, self.password).json()
+        manager_picks_json = self.user_json['fpl_api']['picks']
 
         try:
             self.budget = manager_json['last_deadline_value'] + manager_json['last_deadline_bank']
@@ -78,7 +78,7 @@ class UserSquad(AbstractSquad):
 
         return request_payload
 
-    def log_in_and_make_transfers(self):
+    def log_in_and_make_transfers(self, email, password):
         request_payload = self.format_transfer_requests()
-        make_transfers(request_payload, self.email, self.password)
+        make_transfers(request_payload, email, password)
         self.staged_transfers.clear()

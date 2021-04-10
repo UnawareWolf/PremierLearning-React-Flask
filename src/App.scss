@@ -8,10 +8,9 @@
   
   #userStamp {
     position: relative;
-    /* right: 100%; */
     text-align: end;
     padding: 6px;
-    color: $highlightColour;
+    color: $primaryColour;
     font-size: 12px;
     font-weight: bold;
   }
@@ -27,9 +26,9 @@
   }
   
   #bottom {
+    margin-top: 18px;
     position: absolute;
     top: 15%;
-    text-align: center;
     width: 100%;
   }
   
@@ -41,7 +40,6 @@
     color: white;
     display: inline-block;
     text-decoration: none;
-    text-align: center;
     border: 0px;
     padding: 8px 16px;
     border-radius: 12px 12px 12px 12px;
@@ -49,5 +47,5 @@
   }
   
   button.general:hover {
-    background-color: $primaryColour;
+    background-color: $secondaryColour;
   }
