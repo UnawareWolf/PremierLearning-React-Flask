@@ -3,7 +3,7 @@ import { User, UserContext, defaultUserTeam, SetUserTeamCallback } from './App';
 
 type SetUserCallback = (user: User) => void;
 
-type SetTabCallback = (tab: string) => void;
+export type SetTabCallback = (tab: string) => void;
 
 interface LoginProps {
    setUser: SetUserCallback,

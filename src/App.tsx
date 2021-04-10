@@ -6,6 +6,7 @@ import './App.scss';
 import { Login } from './Login';
 import { Default } from './Default';
 import { TransferMap } from './Transfer';
+import {UserIcon} from './UserIcon';
 
 
 export interface StructuredTeam {
@@ -97,16 +98,15 @@ function App() {
          <UserContext.Provider value={user}>
             <div id='top'>
                <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />
-               {user.loggedIn && <div id='userStamp'>{user.name}</div>}
-               
+               {user.loggedIn && <UserIcon setTab={setTabCallback} />}
             </div>
             <div id='bottom'>
-               {/* Note: Player point predictions are 100% guaranteed to be accurate.<br /><br /> */}
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
                   {tabSelected === 'team' && <TeamFC userTeam={userTeam} setUserTeam={setUserTeamCallback} />}
                   {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                   {tabSelected === 'default' && <Default />}
+                  {tabSelected === 'about' && 'Player point predictions are 100% guaranteed to be accurate.'}
                </PlayerMapContext.Provider>
             </div>
          </UserContext.Provider>

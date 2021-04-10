@@ -1,0 +1,15 @@
+@import 'common.scss';
+
+#userStamp {
+    position: relative;
+    text-align: end;
+    padding: 6px;
+    color: $primaryColour;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#userStamp:hover {
+    color: $highlightColour;
+}
