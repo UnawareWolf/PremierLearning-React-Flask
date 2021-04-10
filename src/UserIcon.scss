@@ -7,9 +7,12 @@
     color: $primaryColour;
     font-size: 12px;
     font-weight: bold;
+}
+
+span {
     cursor: pointer;
 }
 
-#userStamp:hover {
+span:hover {
     color: $highlightColour;
 }

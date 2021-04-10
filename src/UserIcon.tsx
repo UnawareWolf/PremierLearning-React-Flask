@@ -14,6 +14,6 @@ export const UserIcon: FC<UserIconProps> = ({ setTab }) => {
    }
 
    return (
-      <div id='userStamp' onClick={handleClick}>{user.name}</div>
+      <div id='userStamp'><span onClick={handleClick}>{user.name}</span></div>
    );
 }
