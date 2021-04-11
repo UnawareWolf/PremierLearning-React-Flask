@@ -38,3 +38,11 @@ div.tabline {
     height: 4%;
     background-color: $darkColour;
 }
+
+span#loginSuggestion {
+    font-weight: bold;
+}
+
+span#loginSuggestion:hover {
+    color: $highlightColour;
+}

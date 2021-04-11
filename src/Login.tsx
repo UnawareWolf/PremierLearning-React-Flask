@@ -79,7 +79,6 @@ const LoginForm: FC<LoginProps> = ({ setUser, setUserTeam, setTab }) => {
             'password': password
          })
       }).then(res => res.json()).then(data => {
-         console.log(JSON.stringify(data.user));
          setLoginState({
             ...loginState,
             loggingIn: false

@@ -55,3 +55,6 @@ class OptimiseRunner:
             transfers[temp_gameweek] = transfers_this_week
             temp_gameweek += 1
         return transfers
+
+    def get_future_starting_teams(self):
+        return self.squad.get_starting_teams_json()

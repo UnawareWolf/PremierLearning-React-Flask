@@ -1,24 +1,12 @@
 import { useEffect, useState, useCallback, createContext } from 'react';
 import { PlayerMap, PlayerMapContext } from './Player';
-import { TeamFC } from './Team';
+import { TeamPage, StructuredTeam, TeamMap } from './Team';
 import { Tabs } from './Tabs';
 import './App.scss';
 import { Login } from './Login';
 import { Default } from './Default';
 import { TransferMap } from './Transfer';
 import {UserIcon} from './UserIcon';
-
-
-export interface StructuredTeam {
-   starters: number[],
-   bench: number[],
-   captain: number,
-   vc: number
-}
-
-export interface TeamMap {
-   [gameweek: number]: StructuredTeam
-}
 
 export interface User {
    name: string,
@@ -103,7 +91,7 @@ function App() {
             <div id='bottom'>
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
-                  {tabSelected === 'team' && <TeamFC userTeam={userTeam} setUserTeam={setUserTeamCallback} />}
+                  {tabSelected === 'team' && <TeamPage userTeam={userTeam} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                   {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                   {tabSelected === 'default' && <Default />}
                   {tabSelected === 'about' && 'Player point predictions are 100% guaranteed to be accurate.'}

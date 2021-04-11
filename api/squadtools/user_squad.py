@@ -1,5 +1,3 @@
-import requests
-
 from .squad import AbstractSquad
 from .logged_in_action_performer import make_transfers
 
@@ -7,15 +5,12 @@ class UserSquad(AbstractSquad):
 
     def __init__(self, user_json, players, element_types):
         super().__init__(players, element_types)
-        # self.csrftoken = login_initial(email, password)
         self.manager_id = user_json['fpl_api']['manager_id']
         self.user_json = user_json
         self.populate_by_log_in()
 
     def populate_by_log_in(self):
-        # manager_json = requests.get(MANAGER_API % self.manager_id).json()
         manager_json = self.user_json['fpl_api']['manager_json']
-        # manager_picks_json = get_player_ids(self.email, self.password).json()
         manager_picks_json = self.user_json['fpl_api']['picks']
 
         try:
@@ -77,6 +72,17 @@ class UserSquad(AbstractSquad):
             request_payload['transfers'].append(transfer.format_as_request())
 
         return request_payload
+    
+    def get_starting_teams_json(self):
+        starting_teams = {}
+        for gw, team in self.future_starting_teams.items():
+            starting_teams[gw] = {
+                'starters': list(player.id for player in team.players),
+                'bench': list(player.id for player in team.bench),
+                'captain': team.captain.id,
+                'vc': team.vice_captain.id
+            }
+        return starting_teams
 
     def log_in_and_make_transfers(self, email, password):
         request_payload = self.format_transfer_requests()

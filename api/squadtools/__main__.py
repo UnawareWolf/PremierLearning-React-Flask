@@ -14,4 +14,6 @@ if __name__ == '__main__':
     with app.app_context():
         opt = OptimiseRunner(get_user_jsons(fantasy_login['EMAIL'], fantasy_login['PASSWORD']))
         opt.run()
-        print(opt.get_transfers())
+        # print(opt.get_transfers())
+        print(opt.get_future_starting_teams())
+        print()

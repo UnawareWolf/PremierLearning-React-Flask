@@ -4,7 +4,7 @@ from flask_cors import CORS
 from squadtools import OptimiseRunner, get_user_jsons
 from persistence import DB_Handler
 
-bp = Blueprint('selection', __name__, url_prefix='/api')
+bp = Blueprint('login', __name__, url_prefix='/api')
 CORS(bp)
 
 
@@ -21,7 +21,7 @@ def get_all_players():
     return {'players': players}
 
 
-@bp.route('/optimise', methods=(['GET']))
+@bp.route('/team', methods=(['GET']))
 def optimise_by_login():
     if 'user_json' not in session:
         return {'transfers': None}
@@ -54,3 +54,20 @@ def logout():
         }
     }
     return {}
+
+@bp.route('/opt', methods=(['GET']))
+def optimise_by_login_2():
+    print('printing suggested teams')
+    if 'user_json' not in session:
+        print('not logged in')
+        return {'transfers': None, 'suggestedTeams': None}
+    optimise_runner = OptimiseRunner(session['user_json'])
+    optimise_runner.run()
+    transfers = optimise_runner.get_transfers_json()
+    suggestedTeams = optimise_runner.get_future_starting_teams()
+    
+    print(suggestedTeams)
+    return {
+        'transfers': transfers,
+        'suggestedTeams': suggestedTeams
+    }
