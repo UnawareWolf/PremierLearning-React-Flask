@@ -53,7 +53,7 @@ function App() {
          setUserTeam(userTeam);
       },
       [setUserTeam]
-   )
+   );
 
    const setUserCallback = useCallback(
       user => {

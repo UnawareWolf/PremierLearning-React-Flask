@@ -1,10 +1,9 @@
-import { FC, useContext } from 'react';
+import { FC, useCallback, useContext, useState } from 'react';
 import { SetUserTeamCallback, UserContext, UserTeam } from './App';
 import { PlayerMapContext, PlayerFC } from './Player';
 import { TransferList } from './Transfer';
 import { SetTabCallback } from './Login';
 import './Team.scss';
-import { idText } from 'typescript';
 
 export interface StructuredTeam {
    starters: number[],
@@ -83,21 +82,37 @@ interface TeamProps {
 }
 
 interface Formation {
-   [position: number]: string[]
+   [position: number]: number[]
 }
+
+const divID = (id: number) => {
+   return 'player' + id.toString();
+}
+
+export type SetSelectedPlayerCallback = (selectedPlayer: number | null) => void;
 
 const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
    const players = useContext(PlayerMapContext);
+   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
+
+   const setSelectedPlayerCallback = useCallback(
+      selectedPlayer => {
+         setSelectedPlayer(selectedPlayer);
+         console.log(selectedPlayer);
+      },
+      [selectedPlayer]
+   );
+
    if (suggestedTeams == null || players == null) return (<div>null</div>);
 
-   let formation : Formation = {
+   let formation: Formation = {
       1: [],
       2: [],
       3: [],
       4: []
    };
    suggestedTeams[gw].starters.map((id) => (
-      formation[players[id].position].push('player' + id.toString())
+      formation[players[id].position].push(id)
    ));
 
    let renderList = [];
@@ -107,12 +122,12 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
       for (let j in formation[i]) {
          rowFRs += '1fr ';
          currentRow.push(
-            <div id={formation[i][j]} style={{gridArea: formation[i][j]}}>
-               {formation[i][j]}
+            <div id={divID(formation[i][j])} style={{gridArea: divID(formation[i][j])}}>
+               <PlayerFC player={players[formation[i][j]]} selected={selectedPlayer === formation[i][j]} setSelected={setSelectedPlayerCallback}/>
             </div>
          );
       }
-      let templateStyle: string = '\'' + formation[i].join(' ') + '\'';
+      let templateStyle: string = '\'player' + formation[i].join(' player') + '\'';
       console.log(templateStyle);
       renderList.push(
          <div id={'row' + i.toString()} style={{display: 'grid', gridTemplateAreas: templateStyle, gridTemplateColumns: rowFRs}}>
@@ -121,18 +136,9 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
       );
    }
 
-   console.log(formation);
-
    return (
       <div id='suggestedTeams'>
          {renderList}
-         {/* <div id=''>
-
-         </div>
-         <div id='p1'>{suggestedTeams[gw].starters[0]}</div>
-         <div id='p2'>p2</div>
-         <div id='p3'>p3</div>
-         <div id='p4'>p4</div> */}
       </div>
    );
 }

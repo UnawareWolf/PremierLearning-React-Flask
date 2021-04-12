@@ -19,10 +19,10 @@ const TranserFC: FC<TransferProps> = ({ players, transfer }) => {
    return (
       <div>
          <div>
-            Out <PlayerFC player={players[transfer.id_out]} />
+            Out <PlayerFC player={players[transfer.id_out]} selected={false} setSelected={null} />
          </div>
          <div>
-            In <PlayerFC player={players[transfer.id_in]} />
+            In <PlayerFC player={players[transfer.id_in]} selected={false} setSelected={null} />
          </div>
       </div>
    );
