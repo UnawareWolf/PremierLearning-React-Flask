@@ -22,9 +22,19 @@ interface TeamPageProps {
    setTab: SetTabCallback
 }
 
+type SetGwCallback = (gw: number) => void;
+
 export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) => {
    const players = useContext(PlayerMapContext);
    const user = useContext(UserContext);
+   const [selectedGw, setSelectedGw] = useState<number>(0);
+
+   const setGwCallback = useCallback(
+      gw => {
+         setSelectedGw(gw);
+      },
+      [selectedGw]
+   );
 
    const transfersRequest = (e: any) => {
       e.preventDefault();
@@ -34,13 +44,13 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
          loading: true
       });
       fetch('/api/opt', { method: 'GET' }).then(res => res.json()).then(data => {
-         console.log(JSON.stringify(data.suggestedTeams));
          setUserTeam({
             ...userTeam,
             transfers: data.transfers,
             suggestedTeams: data.suggestedTeams,
             loading: false
          });
+         userTeam.suggestedTeams !== null && setSelectedGw(+ Object.keys(userTeam.suggestedTeams)[0]);
       });
    }
 
@@ -57,7 +67,13 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
          {/* <button className='general' onClick={lineupsRequest}>Optimise Lineup</button> */}
          <button className='general' onClick={transfersRequest}>Optimise Team</button>
          <div id='teamPage'>
-            <TeamFC gw={31} suggestedTeams={userTeam.suggestedTeams} />
+            <div id='suggestedTeamsWrapper'>
+               {userTeam.suggestedTeams !== null &&
+                  <GwSelector gameweeks={Object.keys(userTeam.suggestedTeams).map(Number)}
+                     gw={selectedGw} setGw={setGwCallback} />}
+               <TeamFC gw={selectedGw} suggestedTeams={userTeam.suggestedTeams} />
+            </div>
+
             {/* <div id='suggestedTeams'>
 
                <div id='p1'>p1</div>
@@ -72,6 +88,29 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
          ))}
          {userTeam.loading && 'loading'}
          {players != null && userTeam.transfers != null && <TransferList players={players} transfers={userTeam.transfers} />} */}
+      </div>
+   );
+}
+
+interface GwSelectorProps {
+   gameweeks: number[],
+   gw: number,
+   setGw: SetGwCallback
+}
+
+const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw }) => {
+
+   let canDecrease: boolean = gameweeks.includes(gw - 1);
+   let canIncrease: boolean = gameweeks.includes(gw + 1);
+
+   const increase = () => { setGw(gw + 1); }
+   const decrease = () => { setGw(gw - 1); }
+
+   return (
+      <div className='gwSelector'>
+         {canDecrease && <button className='general gwToggle' onClick={decrease}>{'<'}</button>}
+         {'gameweek: ' + gw}
+         {canIncrease && <button className='general gwToggle' onClick={increase}>{'>'}</button>}
       </div>
    );
 }
@@ -98,12 +137,11 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
    const setSelectedPlayerCallback = useCallback(
       selectedPlayer => {
          setSelectedPlayer(selectedPlayer);
-         console.log(selectedPlayer);
       },
       [selectedPlayer]
    );
 
-   if (suggestedTeams == null || players == null) return (<div>null</div>);
+   if (suggestedTeams === null || players === null || gw === 0) return (<div />);
 
    let formation: Formation = {
       1: [],
@@ -111,9 +149,8 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
       3: [],
       4: []
    };
-   suggestedTeams[gw].starters.map((id) => (
-      formation[players[id].position].push(id)
-   ));
+
+   suggestedTeams[gw].starters.map((id) => (formation[players[id].position].push(id)));
 
    let renderList = [];
    for (let i = 1; i <= 4; i++) {
@@ -122,19 +159,40 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
       for (let j in formation[i]) {
          rowFRs += '1fr ';
          currentRow.push(
-            <div id={divID(formation[i][j])} style={{gridArea: divID(formation[i][j])}}>
-               <PlayerFC player={players[formation[i][j]]} selected={selectedPlayer === formation[i][j]} setSelected={setSelectedPlayerCallback}/>
+            <div id={divID(formation[i][j])} style={{ gridArea: divID(formation[i][j]) }}>
+               <PlayerFC
+                  player={players[formation[i][j]]}
+                  selected={selectedPlayer === formation[i][j]}
+                  setSelected={setSelectedPlayerCallback}
+               />
             </div>
          );
       }
       let templateStyle: string = '\'player' + formation[i].join(' player') + '\'';
-      console.log(templateStyle);
       renderList.push(
-         <div id={'row' + i.toString()} style={{display: 'grid', gridTemplateAreas: templateStyle, gridTemplateColumns: rowFRs}}>
+         <div id={'team' + i.toString()} style={{ display: 'grid', gridTemplateAreas: templateStyle, gridTemplateColumns: rowFRs }}>
             {currentRow}
          </div>
       );
    }
+   let subRow: any = [];
+   for (let i in suggestedTeams[gw].bench) {
+      subRow.push(
+         <div id={divID(suggestedTeams[gw].bench[i])} style={{ gridArea: divID(suggestedTeams[gw].bench[i]) }}>
+            <PlayerFC
+               player={players[suggestedTeams[gw].bench[i]]}
+               selected={selectedPlayer === suggestedTeams[gw].bench[i]}
+               setSelected={setSelectedPlayerCallback}
+            />
+         </div>
+      );
+   }
+   let templateStyle: string = '\'player' + suggestedTeams[gw].bench.join(' player') + '\'';
+   renderList.push(
+      <div id='subs' style={{ display: 'grid', gridTemplateAreas: templateStyle, gridTemplateColumns: 'fr fr fr fr' }}>
+         {subRow}
+      </div>
+   );
 
    return (
       <div id='suggestedTeams'>

@@ -1,18 +1,28 @@
 div#teamPage {
     display: grid;
-    grid-template-areas: 'edge1 suggestedTeams suggestedTransfers edge2';
-    grid-template-columns: 80px 2fr 1fr 80px;
+    grid-template-areas: 'edge1 suggestedTeamsWrapper suggestedTransfers edge2';
+    grid-template-columns: 40px 2fr 1fr 40px;
+}
+
+div#suggestedTeamsWrapper {
+    grid-area: suggestedTeamsWrapper;
+    display: grid;
+    grid-template-areas:
+        'gwSelector'
+        'suggestedTeams';
+    grid-template-rows: 1fr 7fr;
 }
 
 div#suggestedTeams {
     grid-area: suggestedTeams;
     display: grid;
     grid-template-areas:
-        'row1'
-        'row2'
-        'row3'
-        'row4';
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+        'team1'
+        'team2'
+        'team3'
+        'team4'
+        'subs';
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
 }
 
 div#suggestedTransfers {
@@ -21,4 +31,12 @@ div#suggestedTransfers {
 
 div#edge {
     grid-area: edge;
+}
+
+div.gwSelector {
+    grid-area: gwSelector;
+}
+
+button.gwToggle {
+    height: 100%;
 }
