@@ -21,19 +21,11 @@ interface TransferProps {
 const TranserFC: FC<TransferProps> = ({ players, transfer, setSelectedPlayer }) => {
    return (
       <div className='transfer' >
-         {/* <span> */}
             <PlayerName player={players[transfer.id_out]} selected={false}
                setSelected={setSelectedPlayer} />
             {' > '}
             <PlayerName player={players[transfer.id_in]} selected={false}
                setSelected={setSelectedPlayer} />
-         {/* </span> */}
-         {/* <div>
-            Out <PlayerName player={players[transfer.id_out]} selected={false} setSelected={null} />
-         </div>
-         <div>
-            In <PlayerName player={players[transfer.id_in]} selected={false} setSelected={null} />
-         </div> */}
       </div>
    );
 }

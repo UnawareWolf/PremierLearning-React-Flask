@@ -1,3 +1,5 @@
+@import 'common.scss';
+
 div#teamPage {
     display: grid;
     grid-template-areas: 'edge1 suggestedTeamsWrapper suggestedTransfers edge2';
@@ -21,8 +23,9 @@ div#suggestedTeams {
         'team2'
         'team3'
         'team4'
-        'subs';
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+        'subs'
+        'selected';
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 div#suggestedTransfers {
@@ -38,5 +41,10 @@ div.gwSelector {
 }
 
 button.gwToggle {
-    height: 100%;
+    opacity: 0.5;
+    vertical-align: middle;
+}
+
+button.hide {
+    visibility: hidden;
 }

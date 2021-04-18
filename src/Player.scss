@@ -10,14 +10,16 @@ button.player {
     cursor: pointer;
     margin: 4px;
     text-decoration: none;
-    width: 90px;
-    height: 60px;
+    width: 6rem;
+    height: 4rem;
+    vertical-align: top;
+    word-break: break-word;
 }
 
 button.playerSelected {
     border-style: solid;
     border-width: 2px;
-    padding: 4px 6px;
+    padding: 6px 14px;
     background-color: $darkColour;
     border-color: $secondaryColour;
 }

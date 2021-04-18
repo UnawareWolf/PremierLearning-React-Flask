@@ -83,8 +83,8 @@ interface PlayerDetailProps {
 
 export const PlayerDetail: FC<PlayerDetailProps> = ({ player }) => {
    return (
-      <div>
-         <button className={'player playerSelected'} >
+      <div id='selected'>
+         <button className='player playerSelected' >
             <div>{player.first_name}</div>
             <div>{player.last_name}</div>
             <div>{player.current_cost}</div>
@@ -93,4 +93,3 @@ export const PlayerDetail: FC<PlayerDetailProps> = ({ player }) => {
       </div>
    );
 }
-

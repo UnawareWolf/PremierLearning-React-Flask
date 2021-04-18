@@ -42,7 +42,7 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
    useEffect(() => {
       userTeam.suggestedTeams !== null && setSelectedGw(+ Object.keys(userTeam.suggestedTeams)[0]);
    }, [userTeam.suggestedTeams, userTeam.loading]);
-   
+
    const setGwCallback = useCallback(
       gw => {
          setSelectedGw(gw);
@@ -54,7 +54,6 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
       e.preventDefault();
       setUserTeam({
          ...userTeam,
-         // transfers: null,
          loading: true
       });
       fetch('/api/opt', { method: 'GET' }).then(res => res.json()).then(data => {
@@ -78,9 +77,8 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
 
    return (
       <div>
-         {/* <button className='general' onClick={lineupsRequest}>Optimise Lineup</button> */}
-         {!userTeam.loading && <button className='general' onClick={transfersRequest}>Optimise Team</button>}
-         {userTeam.loading && <div>loading ...</div>}
+         {userTeam.loading ? <div>loading ...</div> :
+            <button className='general' onClick={transfersRequest}>Optimise Team</button>}
          <div id='teamPage'>
             <div id='suggestedTeamsWrapper'>
                {userTeam.suggestedTeams !== null &&
@@ -89,25 +87,12 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
                <TeamFC gw={selectedGw} suggestedTeams={userTeam.suggestedTeams}
                   selectedPlayer={selectedPlayer} setSelectedPlayer={setSelectedPlayerCallback} />
             </div>
-
-            {/* <div id='suggestedTeams'>
-
-               <div id='p1'>p1</div>
-               <div id='p2'>p2</div>
-               <div id='p3'>p3</div>
-               <div id='p4'>p4</div>
-            </div> */}
             <div id='suggestedTransfers'>
                {players != null && userTeam.transfers != null &&
-               <TransferList players={players} transfers={userTeam.transfers}
-                  setSelectedPlayer={setSelectedPlayerCallback} />}
+                  <TransferList players={players} transfers={userTeam.transfers}
+                     setSelectedPlayer={setSelectedPlayerCallback} />}
             </div>
          </div>
-         {/* {players != null && userTeam.teamIDs != null && userTeam.teamIDs.map((id) => (
-            <PlayerFC player={players[id]} />
-         ))}
-         {userTeam.loading && 'loading'}
-         {players != null && userTeam.transfers != null && <TransferList players={players} transfers={userTeam.transfers} />} */}
       </div>
    );
 }
@@ -117,6 +102,8 @@ interface GwSelectorProps {
    gw: number,
    setGw: SetGwCallback
 }
+
+const selectorStyle = 'general gwToggle';
 
 const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw }) => {
 
@@ -128,9 +115,9 @@ const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw }) => {
 
    return (
       <div className='gwSelector'>
-         {canDecrease && <button className='general gwToggle' onClick={decrease}>{'<'}</button>}
-         {'gameweek: ' + gw}
-         {canIncrease && <button className='general gwToggle' onClick={increase}>{'>'}</button>}
+         <button className={canDecrease ? selectorStyle : selectorStyle + ' hide'} onClick={decrease}>{'<'}</button>
+         {'Gameweek ' + gw}
+         <button className={canIncrease ? selectorStyle : selectorStyle + ' hide'} onClick={increase}>{'>'}</button>
       </div>
    );
 }
@@ -152,23 +139,10 @@ const divID = (id: number) => {
 
 const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelectedPlayer }) => {
    const players = useContext(PlayerMapContext);
-   // const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
-
-   // const setSelectedPlayerCallback = useCallback(
-   //    selectedPlayer => {
-   //       setSelectedPlayer(selectedPlayer);
-   //    },
-   //    []
-   // );
 
    if (suggestedTeams === null || players === null || gw === 0) return (<div />);
 
-   let formation: Formation = {
-      1: [],
-      2: [],
-      3: [],
-      4: []
-   };
+   let formation: Formation = { 1: [], 2: [], 3: [], 4: [] };
 
    suggestedTeams[gw].starters.map((id) => (formation[players[id].position].push(id)));
 
@@ -217,9 +191,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
    return (
       <div id='suggestedTeams'>
          {renderList}
-         <div>
-            {selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} />}
-         </div>
+         {selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} />}
       </div>
    );
 }
