@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, createContext } from 'react';
 import { PlayerMap, PlayerMapContext } from './Player';
-import { TeamPage, StructuredTeam, TeamMap } from './Team';
+import { TeamPage, TeamMap } from './Team';
 import { Tabs } from './Tabs';
 import './App.scss';
 import { Login } from './Login';

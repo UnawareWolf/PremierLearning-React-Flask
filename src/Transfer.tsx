@@ -1,5 +1,7 @@
 import { FC } from 'react';
-import { PlayerMap, PlayerFC, } from './Player';
+import { PlayerMap, PlayerName, } from './Player';
+import './Transfer.scss';
+import { SetSelectedPlayerCallback } from './Team';
 
 interface Transfer {
    id_out: number,
@@ -12,33 +14,45 @@ export interface TransferMap {
 
 interface TransferProps {
    players: PlayerMap,
-   transfer: Transfer
+   transfer: Transfer,
+   setSelectedPlayer: SetSelectedPlayerCallback
 }
 
-const TranserFC: FC<TransferProps> = ({ players, transfer }) => {
+const TranserFC: FC<TransferProps> = ({ players, transfer, setSelectedPlayer }) => {
    return (
-      <div>
-         <div>
-            Out <PlayerFC player={players[transfer.id_out]} selected={false} setSelected={null} />
+      <div className='transfer' >
+         {/* <span> */}
+            <PlayerName player={players[transfer.id_out]} selected={false}
+               setSelected={setSelectedPlayer} />
+            {' > '}
+            <PlayerName player={players[transfer.id_in]} selected={false}
+               setSelected={setSelectedPlayer} />
+         {/* </span> */}
+         {/* <div>
+            Out <PlayerName player={players[transfer.id_out]} selected={false} setSelected={null} />
          </div>
          <div>
-            In <PlayerFC player={players[transfer.id_in]} selected={false} setSelected={null} />
-         </div>
+            In <PlayerName player={players[transfer.id_in]} selected={false} setSelected={null} />
+         </div> */}
       </div>
    );
 }
 
 interface TransferListProps {
    players: PlayerMap,
-   transfers: TransferMap
+   transfers: TransferMap,
+   setSelectedPlayer: SetSelectedPlayerCallback
 }
 
-export const TransferList: FC<TransferListProps> = ({ players, transfers }) => {
+export const TransferList: FC<TransferListProps> = ({ players, transfers, setSelectedPlayer }) => {
    let transferRenders = [];
    for (let i in transfers) {
       transferRenders.push(<div>{'Gameweek ' + i}</div>);
       for (let j in transfers[i]) {
-         transferRenders.push(<TranserFC players={players} transfer={transfers[i][j]} />);
+         transferRenders.push(
+            <TranserFC players={players} transfer={transfers[i][j]} 
+               setSelectedPlayer={setSelectedPlayer} />
+         );
       }
    }
    return (

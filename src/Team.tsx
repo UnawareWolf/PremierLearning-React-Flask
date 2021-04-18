@@ -1,6 +1,6 @@
-import { FC, useCallback, useContext, useState } from 'react';
+import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { SetUserTeamCallback, UserContext, UserTeam } from './App';
-import { PlayerMapContext, PlayerFC } from './Player';
+import { PlayerMapContext, PlayerFC, PlayerDetail } from './Player';
 import { TransferList } from './Transfer';
 import { SetTabCallback } from './Login';
 import './Team.scss';
@@ -24,33 +24,47 @@ interface TeamPageProps {
 
 type SetGwCallback = (gw: number) => void;
 
+export type SetSelectedPlayerCallback = (selectedPlayer: number | null) => void;
+
 export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) => {
    const players = useContext(PlayerMapContext);
    const user = useContext(UserContext);
    const [selectedGw, setSelectedGw] = useState<number>(0);
+   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
 
+   const setSelectedPlayerCallback = useCallback(
+      selectedPlayer => {
+         setSelectedPlayer(selectedPlayer);
+      },
+      []
+   );
+
+   useEffect(() => {
+      userTeam.suggestedTeams !== null && setSelectedGw(+ Object.keys(userTeam.suggestedTeams)[0]);
+   }, [userTeam.suggestedTeams, userTeam.loading]);
+   
    const setGwCallback = useCallback(
       gw => {
          setSelectedGw(gw);
       },
-      [selectedGw]
+      []
    );
 
    const transfersRequest = (e: any) => {
       e.preventDefault();
       setUserTeam({
          ...userTeam,
-         transfers: null,
+         // transfers: null,
          loading: true
       });
       fetch('/api/opt', { method: 'GET' }).then(res => res.json()).then(data => {
+         console.log(JSON.stringify(data.suggestedTeams));
          setUserTeam({
             ...userTeam,
             transfers: data.transfers,
             suggestedTeams: data.suggestedTeams,
             loading: false
          });
-         userTeam.suggestedTeams !== null && setSelectedGw(+ Object.keys(userTeam.suggestedTeams)[0]);
       });
    }
 
@@ -65,13 +79,15 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
    return (
       <div>
          {/* <button className='general' onClick={lineupsRequest}>Optimise Lineup</button> */}
-         <button className='general' onClick={transfersRequest}>Optimise Team</button>
+         {!userTeam.loading && <button className='general' onClick={transfersRequest}>Optimise Team</button>}
+         {userTeam.loading && <div>loading ...</div>}
          <div id='teamPage'>
             <div id='suggestedTeamsWrapper'>
                {userTeam.suggestedTeams !== null &&
                   <GwSelector gameweeks={Object.keys(userTeam.suggestedTeams).map(Number)}
                      gw={selectedGw} setGw={setGwCallback} />}
-               <TeamFC gw={selectedGw} suggestedTeams={userTeam.suggestedTeams} />
+               <TeamFC gw={selectedGw} suggestedTeams={userTeam.suggestedTeams}
+                  selectedPlayer={selectedPlayer} setSelectedPlayer={setSelectedPlayerCallback} />
             </div>
 
             {/* <div id='suggestedTeams'>
@@ -81,7 +97,11 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
                <div id='p3'>p3</div>
                <div id='p4'>p4</div>
             </div> */}
-            <div id='suggestedTransfers'>Transfers</div>
+            <div id='suggestedTransfers'>
+               {players != null && userTeam.transfers != null &&
+               <TransferList players={players} transfers={userTeam.transfers}
+                  setSelectedPlayer={setSelectedPlayerCallback} />}
+            </div>
          </div>
          {/* {players != null && userTeam.teamIDs != null && userTeam.teamIDs.map((id) => (
             <PlayerFC player={players[id]} />
@@ -117,7 +137,9 @@ const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw }) => {
 
 interface TeamProps {
    gw: number,
-   suggestedTeams: TeamMap | null
+   suggestedTeams: TeamMap | null,
+   selectedPlayer: null | number,
+   setSelectedPlayer: SetSelectedPlayerCallback
 }
 
 interface Formation {
@@ -128,18 +150,16 @@ const divID = (id: number) => {
    return 'player' + id.toString();
 }
 
-export type SetSelectedPlayerCallback = (selectedPlayer: number | null) => void;
-
-const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
+const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelectedPlayer }) => {
    const players = useContext(PlayerMapContext);
-   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
+   // const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
 
-   const setSelectedPlayerCallback = useCallback(
-      selectedPlayer => {
-         setSelectedPlayer(selectedPlayer);
-      },
-      [selectedPlayer]
-   );
+   // const setSelectedPlayerCallback = useCallback(
+   //    selectedPlayer => {
+   //       setSelectedPlayer(selectedPlayer);
+   //    },
+   //    []
+   // );
 
    if (suggestedTeams === null || players === null || gw === 0) return (<div />);
 
@@ -163,7 +183,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
                <PlayerFC
                   player={players[formation[i][j]]}
                   selected={selectedPlayer === formation[i][j]}
-                  setSelected={setSelectedPlayerCallback}
+                  setSelected={setSelectedPlayer}
                />
             </div>
          );
@@ -182,7 +202,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
             <PlayerFC
                player={players[suggestedTeams[gw].bench[i]]}
                selected={selectedPlayer === suggestedTeams[gw].bench[i]}
-               setSelected={setSelectedPlayerCallback}
+               setSelected={setSelectedPlayer}
             />
          </div>
       );
@@ -197,6 +217,9 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams }) => {
    return (
       <div id='suggestedTeams'>
          {renderList}
+         <div>
+            {selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} />}
+         </div>
       </div>
    );
 }

@@ -35,7 +35,6 @@ def login():
     request_data = request.get_json()
 
     session['user_json'] = get_user_jsons(request_data['username'], request_data['password'])
-    print(session['user_json']['user'])
     return {'user': session['user_json']['user']}
 
 
@@ -57,16 +56,12 @@ def logout():
 
 @bp.route('/opt', methods=(['GET']))
 def optimise_by_login_2():
-    print('printing suggested teams')
     if 'user_json' not in session:
-        print('not logged in')
         return {'transfers': None, 'suggestedTeams': None}
     optimise_runner = OptimiseRunner(session['user_json'])
     optimise_runner.run()
     transfers = optimise_runner.get_transfers_json()
     suggestedTeams = optimise_runner.get_future_starting_teams()
-    
-    print(suggestedTeams)
     return {
         'transfers': transfers,
         'suggestedTeams': suggestedTeams
