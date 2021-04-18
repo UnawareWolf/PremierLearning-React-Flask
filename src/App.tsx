@@ -32,6 +32,17 @@ export const defaultUserTeam: UserTeam = {
    loading: false
 }
 
+export const UserTeamContext = createContext<UserTeam>(defaultUserTeam);
+
+// interface JumboProps {
+//    user: User,
+//    userTeam: UserTeam,
+   
+
+// }
+
+// export const JumboContext = createContext<JumboProps>(defaultJumbo);
+
 export const UserContext = createContext<User>(defaultUser);
 
 export type SetUserTeamCallback = (userteam: UserTeam) => void;
@@ -91,7 +102,12 @@ function App() {
             <div id='bottom'>
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
-                  {tabSelected === 'team' && <TeamPage userTeam={userTeam} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
+                  <UserTeamContext.Provider value={userTeam}>
+                     {tabSelected === 'team' &&
+                        <TeamPage userTeam={userTeam}
+                           setUserTeam={setUserTeamCallback}
+                           setTab={setTabCallback} />}
+                  </UserTeamContext.Provider>
                   {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                   {tabSelected === 'default' && <Default />}
                   {tabSelected === 'about' && 'Player point predictions are 100% guaranteed to be accurate.'}

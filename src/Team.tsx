@@ -158,6 +158,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
                   player={players[formation[i][j]]}
                   selected={selectedPlayer === formation[i][j]}
                   setSelected={setSelectedPlayer}
+                  gw={gw}
                />
             </div>
          );
@@ -177,6 +178,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
                player={players[suggestedTeams[gw].bench[i]]}
                selected={selectedPlayer === suggestedTeams[gw].bench[i]}
                setSelected={setSelectedPlayer}
+               gw={gw}
             />
          </div>
       );
