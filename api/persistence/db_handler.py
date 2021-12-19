@@ -60,17 +60,18 @@ class DB_Handler:
     def persist_match(self, match):
         self.cursor.execute('''insert into matches (player_id, minutes, points, gameweek)
             values (?, ?, ?, ?)''', match.format_as_db_insert())
-
-    # def get_future_matches(self):
-    #     future_matches = {}
-    #     for db_future_match in self.cursor.execute('select player_id, minutes, points, gameweek from future_matches').fetchall():
-    #         future_match = self.convert_match_from_db(db_future_match)
-    #         if future_match.player_id in future_matches:
-    #             future_matches[future_match.player_id].append(future_match)
-    #         else:
-    #             future_matches[future_match.player_id] = [future_match]
-    #     return future_matches
     
+    def add_match_to_dict(self, matches_dict, match, player_id):
+        if match['gameweek'] is None:
+            match['gameweek'] = 0
+        if player_id not in matches_dict:
+            matches_dict[player_id] = {match['gameweek']: [match]}
+        else:
+            if match['gameweek'] not in matches_dict[player_id]:
+                matches_dict[player_id][match['gameweek']] = [match]
+            else:
+                matches_dict[player_id][match['gameweek']].append(match)
+
     def get_future_match_jsons(self):
         future_matches = {}
         for db_future_match in self.cursor.execute('select player_id, minutes, points, gameweek from future_matches').fetchall():
@@ -80,20 +81,8 @@ class DB_Handler:
                 'points': db_future_match[2],
                 'gameweek': db_future_match[3]
             }
-            if player_id not in future_matches:
-                future_matches[player_id] = [future_match]
-            else:
-                future_matches[player_id].append(future_match)
+            self.add_match_to_dict(future_matches, future_match, player_id)
         return future_matches
-
-    # @staticmethod
-    # def convert_match_from_db(db_match):
-    #     match = RawMatch()
-    #     match.player_id = db_match[0]
-    #     match.minutes = db_match[1]
-    #     match.points = db_match[2]
-    #     match.gameweek = db_match[3]
-    #     return match
 
     @staticmethod
     def convert_match_from_json(player_id, match_json):
@@ -103,16 +92,6 @@ class DB_Handler:
         match.points = match_json['points']
         match.gameweek = match_json['gameweek']
         return match
-
-    # def get_matches(self):
-    #     matches = {}
-    #     for db_match in self.cursor.execute('select player_id, minutes, points, gameweek from matches').fetchall():
-    #         match = self.convert_match_from_db(db_match)
-    #         if match.player_id in matches:
-    #             matches[match.player_id].append(match)
-    #         else:
-    #             matches[match.player_id] = [match]
-    #     return matches
     
     def get_match_jsons(self):
         matches = {}
@@ -123,10 +102,7 @@ class DB_Handler:
                 'points': db_match[2],
                 'gameweek': db_match[3]
             }
-            if player_id not in matches:
-                matches[player_id] = [match]
-            else:
-                matches[player_id].append(match)
+            self.add_match_to_dict(matches, match, player_id)
         return matches
 
     def get_player_jsons(self):
@@ -135,6 +111,9 @@ class DB_Handler:
         future_matches = self.get_future_match_jsons()
         for db_player in self.cursor.execute('select id, first_name, surname, team_id, current_cost, position from players').fetchall():
             player_id = db_player[0]
+            player_matches = {}
+            if player_id in matches:
+                player_matches = matches[player_id]
             player = {
                 'id': player_id,
                 'first_name': db_player[1],
@@ -142,29 +121,11 @@ class DB_Handler:
                 'team_id': db_player[3],
                 'current_cost': db_player[4],
                 'position': db_player[5],
-                'matches': matches[player_id],
+                'matches': player_matches,
                 'future_matches': future_matches[player_id]
             }
             players[player_id] = player
         return players
-
-    # def get_players(self):
-    #     players = {}
-    #     matches_dict = self.get_matches()
-    #     future_matches_dict = self.get_future_matches()
-    #     for db_player in self.cursor.execute('select id, first_name, surname, team_id, current_cost, position from players').fetchall():
-    #         player = RawPlayer()
-    #         player.id = db_player[0]
-    #         player.first_name = db_player[1]
-    #         player.last_name = db_player[2]
-    #         player.team_id = db_player[3]
-    #         player.current_cost = db_player[4]
-    #         player.position = db_player[5]
-    #         player.matches = matches_dict[player.id]
-    #         player.future_matches = future_matches_dict[player.id]
-    #         players[player.id] = player
-        
-    #     return players
 
     def get_player_objects(self):
         players = {}
@@ -178,12 +139,16 @@ class DB_Handler:
             player.current_cost = player_json['current_cost']
             player.position = player_json['position']
             matches = []
-            for match_json in player_json['matches']:
-                matches.append(self.convert_match_from_json(player_id, match_json))
+
+            for gameweek, match_jsons in player_json['matches'].items():
+                for match_json in match_jsons:
+                    matches.append(self.convert_match_from_json(player_id, match_json))
             player.matches = matches
             future_matches = []
-            for future_match_json in player_json['future_matches']:
-                future_matches.append(self.convert_match_from_json(player_id, future_match_json))
+
+            for gameweek, future_match_jsons in player_json['future_matches'].items():
+                for future_match_json in future_match_jsons:
+                    future_matches.append(self.convert_match_from_json(player_id, future_match_json))
             player.future_matches = future_matches
             players[player_id] = player
         return players
