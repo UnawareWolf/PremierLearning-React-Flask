@@ -140,13 +140,13 @@ class DB_Handler:
             player.position = player_json['position']
             matches = []
 
-            for gameweek, match_jsons in player_json['matches'].items():
+            for match_jsons in player_json['matches'].values():
                 for match_json in match_jsons:
                     matches.append(self.convert_match_from_json(player_id, match_json))
             player.matches = matches
             future_matches = []
 
-            for gameweek, future_match_jsons in player_json['future_matches'].items():
+            for future_match_jsons in player_json['future_matches'].values():
                 for future_match_json in future_match_jsons:
                     future_matches.append(self.convert_match_from_json(player_id, future_match_json))
             player.future_matches = future_matches
