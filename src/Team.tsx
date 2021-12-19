@@ -1,9 +1,10 @@
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { SetUserTeamCallback, UserContext, UserTeam } from './App';
-import { PlayerMapContext, PlayerFC, PlayerDetail } from './Player';
+import { PlayerMapContext, PlayerFC, PlayerDetail, getPoints } from './Player';
 import { TransferList } from './Transfer';
 import { SetTabCallback } from './Login';
 import './Team.scss';
+import { idText } from 'typescript';
 
 export interface StructuredTeam {
    starters: number[],
@@ -31,6 +32,7 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
    const user = useContext(UserContext);
    const [selectedGw, setSelectedGw] = useState<number>(0);
    const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
+   const [gwPoints, setGwPoints] = useState<number>(0);
 
    const setSelectedPlayerCallback = useCallback(
       selectedPlayer => {
@@ -40,8 +42,22 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
    );
 
    useEffect(() => {
-      userTeam.suggestedTeams !== null && setSelectedGw(+ Object.keys(userTeam.suggestedTeams)[0]);
+      if (userTeam.suggestedTeams !== null) setSelectedGw(+ Object.keys(userTeam.suggestedTeams)[0]);
    }, [userTeam.suggestedTeams, userTeam.loading]);
+
+   useEffect(() => {
+      if (userTeam.suggestedTeams === null || players === null ||
+         userTeam.suggestedTeams[selectedGw] === undefined) {
+         setGwPoints(0);
+         return;
+      }
+      let pointSum = 0;
+      for (let id of userTeam.suggestedTeams[selectedGw].starters) {
+         pointSum += getPoints(players[id].future_matches[selectedGw]);
+      }
+      pointSum += getPoints(players[userTeam.suggestedTeams[selectedGw].captain].future_matches[selectedGw]);
+      setGwPoints(pointSum);
+   }, [selectedGw, userTeam.suggestedTeams, players]);
 
    const setGwCallback = useCallback(
       gw => {
@@ -82,14 +98,22 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
          <div id='teamPage'>
             <div id='suggestedTeamsWrapper'>
                {userTeam.suggestedTeams !== null &&
-                  <GwSelector gameweeks={Object.keys(userTeam.suggestedTeams).map(Number)}
-                     gw={selectedGw} setGw={setGwCallback} />}
-               <TeamFC gw={selectedGw} suggestedTeams={userTeam.suggestedTeams}
-                  selectedPlayer={selectedPlayer} setSelectedPlayer={setSelectedPlayerCallback} />
+                  <GwSelector
+                     gameweeks={Object.keys(userTeam.suggestedTeams).map(Number)}
+                     gw={selectedGw}
+                     setGw={setGwCallback}
+                     points={gwPoints} />}
+               <TeamFC
+                  gw={selectedGw}
+                  suggestedTeams={userTeam.suggestedTeams}
+                  selectedPlayer={selectedPlayer}
+                  setSelectedPlayer={setSelectedPlayerCallback} />
             </div>
             <div id='suggestedTransfers'>
                {players != null && userTeam.transfers != null &&
-                  <TransferList players={players} transfers={userTeam.transfers}
+                  <TransferList
+                     players={players}
+                     transfers={userTeam.transfers}
                      setSelectedPlayer={setSelectedPlayerCallback} />}
             </div>
          </div>
@@ -100,12 +124,13 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
 interface GwSelectorProps {
    gameweeks: number[],
    gw: number,
-   setGw: SetGwCallback
+   setGw: SetGwCallback,
+   points: number
 }
 
 const selectorStyle = 'general gwToggle';
 
-const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw }) => {
+const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw, points }) => {
 
    let canDecrease: boolean = gameweeks.includes(gw - 1);
    let canIncrease: boolean = gameweeks.includes(gw + 1);
@@ -118,6 +143,7 @@ const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw }) => {
          <button className={canDecrease ? selectorStyle : selectorStyle + ' hide'} onClick={decrease}>{'<'}</button>
          {'Gameweek ' + gw}
          <button className={canIncrease ? selectorStyle : selectorStyle + ' hide'} onClick={increase}>{'>'}</button>
+         <div>{points.toFixed(2)}</div>
       </div>
    );
 }

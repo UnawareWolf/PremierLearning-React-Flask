@@ -11,14 +11,11 @@ from .season import *
 from .formatted_match_data import FormattedMatchData
 from persistence import DB_Handler
 
-FANTASY_JSON_FILE_LOCATION = 'data/season_20_21/fantasy.json'
-FIXTURES_JSON_FILE_LOCATION = 'data/season_20_21/fixtures.json'
-PLAYER_JSON_FILE_LOCATION = 'data/season_20_21/players/player_%i.json'
 FANTASY_API = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 FIXTURES_API = 'https://fantasy.premierleague.com/api/fixtures/'
 PLAYER_API = 'https://fantasy.premierleague.com/api/element-summary/%i/'
 QUICK_RUN = False
-ALWAYS_UPDATE = True
+ALWAYS_UPDATE = False
 
 
 class Runner:
@@ -44,6 +41,7 @@ class Runner:
         print('Setting up players and teams...')
         self.current_season = CurrentSeason()
         self.populate_past_seasons()
+        self.process_player_matches()
 
         self.calculate_player_ict_and_points_regression()
 
@@ -66,17 +64,17 @@ class Runner:
 
         if update_all:
             print('Getting latest data...')
-            self.persist_json(FANTASY_JSON_FILE_LOCATION, fantasy_json_from_api)
+            self.persist_json(FANTASY_JSON_FILE_LOCATION % (SEASON_YR, SEASON_YR + 1), fantasy_json_from_api)
 
-        if update_all or not os.path.isfile(FIXTURES_JSON_FILE_LOCATION):
+        if update_all or not os.path.isfile(FIXTURES_JSON_FILE_LOCATION % (SEASON_YR, SEASON_YR + 1)):
             fixtures_json = self.get_request_json(FIXTURES_API)
             if fixtures_json is not None:
-                self.persist_json(FIXTURES_JSON_FILE_LOCATION, fixtures_json)
+                self.persist_json(FIXTURES_JSON_FILE_LOCATION % (SEASON_YR, SEASON_YR + 1), fixtures_json)
 
         if fantasy_json_from_api is not None:
             for element in fantasy_json_from_api['elements']:
                 player_id = element['id']
-                player_file_path = PLAYER_JSON_FILE_LOCATION % player_id
+                player_file_path = PLAYER_JSON_FILE_LOCATION % (SEASON_YR, SEASON_YR + 1) + str(player_id) + '.json'
 
                 if update_all or not os.path.isfile(player_file_path):
                     player_json = self.get_request_json(PLAYER_API % player_id)
@@ -97,8 +95,8 @@ class Runner:
             return False
 
         fantasy_json_file = None
-        if os.path.isfile(FANTASY_JSON_FILE_LOCATION):
-            fantasy_json_file = self.read_json(FANTASY_JSON_FILE_LOCATION)
+        if os.path.isfile(FANTASY_JSON_FILE_LOCATION % (SEASON_YR, SEASON_YR + 1)):
+            fantasy_json_file = self.read_json(FANTASY_JSON_FILE_LOCATION % (SEASON_YR, SEASON_YR + 1))
 
         if fantasy_json_file is None:
             return True
@@ -108,8 +106,8 @@ class Runner:
         return last_api_match_id != last_file_match_id
 
     def populate_past_seasons(self):
-        self.past_seasons.append(PastSeason(19))
-        self.past_seasons.append(PastSeason(18))
+        for i in reversed(range(18, SEASON_YR)):
+            self.past_seasons.append(PastSeason(i))
 
         all_seasons = []
         for season in self.past_seasons:
@@ -125,6 +123,20 @@ class Runner:
                         player_last_season.played_last_season = True
 
         print()
+    
+    def process_player_matches(self):
+        # last_szn = next(szn for szn in self.past_seasons if szn.years[0] == self.current_season.years[0] - 1)
+        # if self.current_season.next_gameweek < 12:
+        #     for player in self.current_season.players:
+        #         if player.code in last_szn.player_code_dict:
+        #             player.attach_last_szn_matches(last_szn.player_code_dict[player.code])
+        
+        for player in self.current_season.players:
+            player.process_matches()
+        for season in self.past_seasons:
+            for player in season.players:
+                player.process_matches()
+
 
     def populate_formatted_match_data(self):
         self.populate_learning_inputs_for_season(self.current_season)
@@ -147,11 +159,19 @@ class Runner:
         ict_values = []
         points = []
 
+        # for season in list(self.past_seasons + [self.current_season]):
         for player in self.current_season.players:
+            # for player in season.players:
             for match in player.matches:
                 if match.valid_for_learning:  # and match.is_training_data (if not then its testing data)
                     ict_values.append([match.average_ict_in_previous_matches])
                     points.append([match.average_points_in_previous_matches])
+
+        # for player in self.past_seasons[0].players:
+        #     for match in player.matches:
+        #         if match.valid_for_learning:  # and match.is_training_data (if not then its testing data)
+        #             ict_values.append([match.average_ict_in_previous_matches])
+        #             points.append([match.average_points_in_previous_matches])
 
         ict_reg = linear_model.LinearRegression()
         ict_reg.fit(ict_values, points)
@@ -178,20 +198,6 @@ class Runner:
         y_pred = float(y_pred)
 
         return abs(y_true - y_pred) ** 2
-
-    # def get_predicted_minutes_input(self):
-    #     model_input = []
-    #     model_output = []
-    #
-    #     for player in self.current_season.players:
-    #         # player.build_snapshot_minutes()
-    #
-    #         for match in player.matches:
-    #             model_input.append([match.minutes_last, match.minutes_last_3, match.minutes_last_5,
-    #                                 match.average_minutes, match.matches_available])
-    #             model_output = [match.minutes]
-    #
-    #     return model_input
 
     def predict_minutes(self, future_matches):
 

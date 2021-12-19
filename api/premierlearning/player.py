@@ -10,8 +10,6 @@ class RawPlayer(ABC):
         self.id = None
         self.first_name = None
         self.last_name = None
-        # self.team = None
-        # self.team.id = None
         self.team_id = None
         self.current_cost = None
         self.position = None
@@ -45,7 +43,7 @@ class RawPlayer(ABC):
             bench_multiplier = 1
         if n == free_hit_gw:
             bench_multiplier = 0
-        return sum(fixture.points for fixture in self.future_matches if fixture.gameweek == n) * bench_multiplier
+        return sum(fixture.points for fixture in (self.future_matches + self.matches) if fixture.gameweek == n) * bench_multiplier
 
 
 class Player(RawPlayer):
@@ -85,9 +83,14 @@ class Player(RawPlayer):
 
         self.current_cost = float(self.element_dict['now_cost'])
 
+        self.last_szn_matches = []
+        self.last_szn_avg_mins = 0
+        self.last_szn_avg_points = 0
+
         self.matches = []
         self.future_matches = []
-
+        
+        self.teams = teams
         self.team = teams[int(self.element_dict['team'])]
 
         self.team_id = self.team.id
@@ -98,9 +101,11 @@ class Player(RawPlayer):
 
         self.last_points = float(self.get_last_points())
 
-        self.build_snapshot_stats()
+        # self.attach_last_szn_matches()
 
-        self.populate_future_matches(teams)
+        # self.build_snapshot_stats()
+
+        # self.populate_future_matches(teams)
 
     def __str__(self):
         points = 0
@@ -144,6 +149,35 @@ class Player(RawPlayer):
         for match_json in self.player_json['history']:
             if match_json['team_h_score'] is not None:
                 self.matches.append(Match(self, match_json, teams))
+    
+
+    def attach_last_szn_matches(self, past_szn_player):
+        self.last_szn_matches = past_szn_player.matches
+        # match_count = len(self.last_szn_matches)
+        # if match_count > 0:
+        #     self.last_szn_avg_mins = sum(list(match.minutes for match in self.last_szn_matches)) / match_count
+        # match_count_gt_zero = len(list(match for match in self.last_szn_matches if match.minutes > 0))
+        # if match_count_gt_zero > 0:
+        #     self.last_szn_avg_points = sum(list(match.points for match in self.last_szn_matches if match.minutes > 0)) / match_count_gt_zero
+        len_matches = len(self.matches)
+        len_past_matches = len(past_szn_player.matches)
+        len_matches_to_insert = 7 - len_matches
+        if len_past_matches >= len_matches_to_insert:
+            matches_to_insert = past_szn_player.matches[- len_matches_to_insert:]
+        else:
+            matches_to_insert = past_szn_player.matches
+        if self.matches:
+            matches_to_insert.extend(self.matches)
+            self.matches = matches_to_insert
+        else:
+            self.matches = matches_to_insert
+
+
+    def process_matches(self):
+        self.build_snapshot_stats()
+
+        self.populate_future_matches(self.teams)
+
 
     def populate_future_matches(self, teams):
         for future_match_json in self.player_json['fixtures']:
@@ -156,17 +190,29 @@ class Player(RawPlayer):
 
         for match in self.future_matches:
             if len(self.minutes_so_far) > 0:
+                # if len is up to 6, include some proportion of stats from last szn :)
                 match.minutes_last = self.minutes_so_far[-1]
                 match.average_minutes_last_3 = sum(self.minutes_so_far[-3:]) / len(self.minutes_so_far[-3:])
                 match.average_minutes_last_5 = sum(self.minutes_so_far[-5:]) / len(self.minutes_so_far[-5:])
                 match.average_minutes = sum(self.minutes_so_far) / len(self.minutes_so_far)
                 match.matches_available = len(self.minutes_so_far)
                 match.average_minutes_when_played = average_minutes_when_played
+            # elif len(self.last_szn_matches) > 0:
+            #     match.minutes_last = self.last_szn_avg_mins
+            #     match.average_minutes_last_3 = self.last_szn_avg_mins
+            #     match.average_minutes_last_5 = self.last_szn_avg_mins
+            #     match.average_minutes = self.last_szn_avg_mins
+            #     match.matches_available = 0
+            #     match.average_minutes_when_played = self.last_szn_avg_mins # this is not right, should calculate
 
             if len(self.points_so_far) > 0:
                 match.points_last = self.points_so_far[-1]
                 match.average_points_last_3 = sum(self.points_so_far[-3:]) / len(self.points_so_far[-3:])
                 match.average_points_last_5 = sum(self.points_so_far[-5:]) / len(self.points_so_far[-5:])
+            # elif len(self.last_szn_matches) > 0:
+            #     match.points_last = self.last_szn_avg_points
+            #     match.average_points_last_3 = self.last_szn_avg_points
+            #     match.average_points_last_5 = self.last_szn_avg_points
 
     def build_snapshot_stats(self):
         point_sum_so_far = 0
@@ -216,22 +262,6 @@ class Player(RawPlayer):
 
             minutes_so_far.append(int(match.minutes))
         self.minutes_so_far = minutes_so_far
-
-    # def calculate_points_over_next_5_weeks(self):
-    #     # for fixture in self.future_matches:
-    #     #     if fixture.within_n_weeks(n):
-    #     #         self.points_over_next_5_weeks += fixture.points
-    #     self.points_over_next_5_weeks = self.get_points_within_n_weeks(5)
-    #
-    # def get_points_in_n_weeks_exclusive(self, n):
-    #     return self.get_points_within_n_weeks(n) - self.get_points_within_n_weeks(n - 1)
-    #
-    # def get_points_within_n_weeks(self, n):
-    #     points = 0
-    #     for fixture in self.future_matches:
-    #         if fixture.within_n_weeks(n):
-    #             points += fixture.points
-    #     return points
 
     def calculate_points_over_next_5_gameweeks(self):
         self.points_over_next_5_gameweeks = self.get_points_within_n_gameweeks(5)

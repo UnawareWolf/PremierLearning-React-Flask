@@ -11,6 +11,7 @@ class OptimiseRunner:
         self.transfers = None
         self.csrftoken = None
         self.user_json = user_json
+        self.player_dict = None
     
     def get_ids(self):
         return self.squad.get_player_ids()
@@ -20,14 +21,20 @@ class OptimiseRunner:
             elements_dict = json.load(f_in)
 
         db_handler = DB_Handler()
-        players = db_handler.get_player_objects()
+        self.player_dict = db_handler.get_player_objects()
         db_handler.close_connection()
 
-        self.squad = UserSquad(self.user_json, players, elements_dict)
+        self.squad = UserSquad(self.user_json, self.player_dict, elements_dict)
+    
+    def write_top_30_info(self):
+        players_select = sorted(self.player_dict.values(), reverse=True, key=lambda p : p.future_matches[0].points)
+        with open('top_players.txt', 'w') as file:
+            for i in range(30):
+                file.write(str(players_select[i]) + '\n')
         
     def run(self):
-        
         self.populate_squad()
+        self.write_top_30_info()
         self.transfers = self.squad.make_sensible_transfers()
     
     def get_transfers(self):

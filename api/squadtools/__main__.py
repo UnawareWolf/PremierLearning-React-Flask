@@ -15,5 +15,5 @@ if __name__ == '__main__':
         opt = OptimiseRunner(get_user_jsons(fantasy_login['EMAIL'], fantasy_login['PASSWORD']))
         opt.run()
         # print(opt.get_transfers())
-        print(opt.get_future_starting_teams())
-        print()
+        # opt.squad.get_suggested_transfers(15)
+        # print(opt.get_future_starting_teams())

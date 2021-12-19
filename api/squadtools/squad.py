@@ -22,7 +22,7 @@ class AbstractSquad(ABC):
 
     def __init__(self, player_dict, element_types):
         self.squad = []
-        self.next_gameweek = get_next_gameweek()
+        self.next_gameweek = self.get_next_gameweek()
         self.element_types = element_types
         self.player_dict = player_dict
         self.wrapped_player_dict = {}
@@ -36,6 +36,9 @@ class AbstractSquad(ABC):
         self.free_hit_gw = 0
 
         self.populate_wrapped_player_dict(self.player_dict)
+    
+    def get_next_gameweek(self):
+        return get_next_gameweek()
 
     def populate_from_manager_id(self, manager_id):
         self.manager_id = manager_id
@@ -300,6 +303,7 @@ class AbstractSquad(ABC):
             #
             # for transfer in suggested_transfers:
             #     self.make_transfer(transfer)
+        
         return strategy
 
     def get_accurate_points_for_strategy(self, transfer_strategy):

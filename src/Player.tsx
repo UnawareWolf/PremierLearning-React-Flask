@@ -9,6 +9,10 @@ interface Match {
    gameweek: number
 }
 
+interface MatchMap {
+   [gameweek: number]: Match[]
+}
+
 interface Player {
    id: number,
    first_name: string,
@@ -16,8 +20,8 @@ interface Player {
    team_id: number,
    current_cost: number,
    position: number,
-   matches: Match[],
-   future_matches: Match[]
+   matches: MatchMap,
+   future_matches: MatchMap
 }
 
 export interface PlayerMap {
@@ -47,7 +51,6 @@ export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw })
    const userTeam = useContext(UserTeamContext);
 
    const handleClick = () => {
-      console.log(player.id);
       if (setSelected === null) return;
       selected ? setSelected(null) : setSelected(player.id);
    }
@@ -57,6 +60,7 @@ export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw })
          {player.last_name}
          {isCaptain(userTeam, player.id, gw) && '\n(C)'}
          {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
+         {'\n' + getPoints(player.future_matches[gw]).toFixed(2)}
       </button>
    );
 }
@@ -69,7 +73,6 @@ interface PlayerNameProps {
 
 export const PlayerName: FC<PlayerNameProps> = ({ player, selected, setSelected }) => {
    const handleClick = () => {
-      console.log(player.id);
       if (setSelected === null) return;
       selected ? setSelected(null) : setSelected(player.id);
    }
@@ -114,4 +117,12 @@ export const PlayerDetail: FC<PlayerDetailProps> = ({ player }) => {
          </button>
       </div>
    );
+}
+
+export const getPoints = (matches: Match[]): number => {
+   let sum: number = 0;
+   for (let match in matches) {
+      sum += matches[match].points;
+   }
+   return sum;
 }
