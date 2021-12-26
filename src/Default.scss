@@ -1,0 +1,63 @@
+@import 'common.scss';
+
+.searchZone {
+    display: grid;
+    place-items: center;
+}
+
+div.searchBox {
+    background-color: $darkColour;
+    border-radius: 6px;
+    color: white;
+    border: 0px;
+    padding: 0;
+    outline: none;
+    margin: 0.5rem 0.25rem;
+    text-decoration: none;
+    text-align: left;
+    width: 16rem;
+    vertical-align: top;
+    word-break: break-word;
+    display: flex;
+}
+
+input#searchTextBox {
+    background-color: $darkColour;
+    border-radius: 6px;
+    color: white;
+    border: 0px;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+    margin: 0;
+    text-decoration: none;
+    text-align: left;
+    width: 13.6rem;
+    vertical-align: top;
+    word-break: break-word;
+    float: left;
+}
+
+div#searchIcon {
+    background-color: $darkColour;
+    border-radius: 6px;
+    color: white;
+    outline: none;
+    background-image: url('./images/Search_Icon.svg');
+    background-size: 14px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    text-decoration: none;
+    text-align: left;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    cursor: pointer;
+    vertical-align: top;
+    word-break: break-word;
+    flex-grow: 1;
+    padding-top: 0.5rem;
+}
+
+div#searchIcon:hover {
+    background-color: $secondaryColour;
+}

@@ -3,6 +3,13 @@ import { SetSelectedPlayerCallback } from './Team';
 import './Player.scss';
 import { UserTeam, UserTeamContext } from './App';
 
+const trimName = (nameIn : string) : string => {
+   const maxLen : number = 10;
+   let nameText : string;
+   nameIn.length > maxLen ? nameText = nameIn.substring(0, maxLen - 1) + ".." : nameText = nameIn;
+   return nameText;
+}
+
 interface Match {
    minutes: number,
    points: number,
@@ -57,10 +64,10 @@ export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw })
 
    return (
       <button className={selected ? 'player playerSelected' : 'player'} onClick={handleClick} >
-         {player.last_name}
+         {`${trimName(player.first_name)}  ${trimName(player.last_name)}`}
          {isCaptain(userTeam, player.id, gw) && '\n(C)'}
          {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
-         {'\n' + getPoints(player.future_matches[gw]).toFixed(2)}
+         {/* {'\n' + getPoints(player.future_matches[gw]).toFixed(2)} */}
       </button>
    );
 }
@@ -78,19 +85,27 @@ export const PlayerName: FC<PlayerNameProps> = ({ player, selected, setSelected 
    }
    return (
       <span className='playerName' onClick={handleClick} >
-         {player.last_name}
+         {trimName(player.last_name)}
       </span>
    );
 }
 
 interface PlayerListProps {
-   players: PlayerMap
+   players: PlayerMap,
+   filterText: string
 }
 
-export const PlayerList: FC<PlayerListProps> = ({ players }) => {
+const passFilter = (player: Player, filterText: string): boolean => {
+   const name: string = player.first_name + ' ' + player.last_name;
+   console.log(name + ' ' + filterText)
+   return name.includes(filterText);
+}
+
+export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
+   console.log(filterText);
    let playerRenders = [];
    for (let i in players) {
-      if (i in players) {
+      if (i in players && passFilter(players[i], filterText)) {
          playerRenders.push(<PlayerFC player={players[i]} selected={false}
             setSelected={null} gw={0} />);
       }
