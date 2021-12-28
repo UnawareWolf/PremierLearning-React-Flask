@@ -6,7 +6,8 @@ create table players (
     team_id integer not null,
     team varchar(255),
     current_cost real not null,
-    position integer not null
+    position integer not null,
+    code integer
 );
 
 create table matches (

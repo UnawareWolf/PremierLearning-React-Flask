@@ -29,6 +29,7 @@ interface Player {
    team: string,
    current_cost: number,
    position: number,
+   code: number,
    matches: MatchMap,
    future_matches: MatchMap
 }
@@ -220,6 +221,8 @@ export const PlayerDetail: FC<PlayerDetailProps> = ({ player, setSelected }) => 
                   <th>{player.last_name}</th>
                </tr>
             </table>
+            
+            <img src={'https://resources.premierleague.com/premierleague/photos/players/110x140/p' + player.code + '.png'} />
 
             <table id='playerInfo'>
                <tr>

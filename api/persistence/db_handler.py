@@ -46,8 +46,8 @@ class DB_Handler:
             self.persist_player(player)
 
     def persist_player(self, player):
-        self.cursor.execute('''insert into players (id, first_name, surname, team_id, team, current_cost, position)
-            values (?, ?, ?, ?, ?, ?, ?)''', player.format_as_db_insert())
+        self.cursor.execute('''insert into players (id, first_name, surname, team_id, team, current_cost, position, code)
+            values (?, ?, ?, ?, ?, ?, ?, ?)''', player.format_as_db_insert())
         for match in player.matches:
             self.persist_match(match)
         for future_match in player.future_matches:
@@ -112,7 +112,7 @@ class DB_Handler:
         players = {}
         matches = self.get_match_jsons()
         future_matches = self.get_future_match_jsons()
-        for db_player in self.cursor.execute('select id, first_name, surname, team_id, team, current_cost, position from players').fetchall():
+        for db_player in self.cursor.execute('select id, first_name, surname, team_id, team, current_cost, position, code from players').fetchall():
             player_id = db_player[0]
             player_matches = {}
             if player_id in matches:
@@ -125,6 +125,7 @@ class DB_Handler:
                 'team': db_player[4],
                 'current_cost': db_player[5],
                 'position': db_player[6],
+                'code': db_player[7],
                 'matches': player_matches,
                 'future_matches': future_matches[player_id]
             }
@@ -143,6 +144,7 @@ class DB_Handler:
             player.team_name = player_json['team']
             player.current_cost = player_json['current_cost']
             player.position = player_json['position']
+            player.code = player_json['code']
             matches = []
 
             for match_jsons in player_json['matches'].values():

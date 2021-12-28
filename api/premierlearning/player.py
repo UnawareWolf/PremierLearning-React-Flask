@@ -15,7 +15,8 @@ class RawPlayer(ABC):
         self.current_cost = None
         self.position = None
         self.matches = None
-        self.future_matches = None
+        self.future_matches = None,
+        self.code = None
     
     def __repr__(self):
         points = 0
@@ -31,7 +32,8 @@ class RawPlayer(ABC):
             self.team_id,
             self.team_name,
             self.current_cost,
-            self.position
+            self.position,
+            self.code
         )
     
 
