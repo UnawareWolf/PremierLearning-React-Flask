@@ -9,13 +9,15 @@ class RawMatch(ABC):
         self.minutes = None
         self.points = None
         self.gameweek = None
+        self.opponent = None
 
     def format_as_db_insert(self):
         return (
             self.player_id,
             float(self.minutes),
             float(self.points),
-            self.gameweek
+            self.gameweek,
+            self.opponent
         )
 
 
@@ -54,6 +56,8 @@ class Match(RawMatch):
             self.team_match = self.team.team_match_dict[self.fixture_id]
         except:
             self.team_match = self.team.future_team_match_dict[self.fixture_id]
+
+        self.opponent = self.opponent_team.name
 
         self.average_points_in_previous_matches = 0
         self.average_points_last_5 = 0
@@ -107,6 +111,8 @@ class FutureMatch(RawMatch):
             self.team_match = self.team.future_team_match_dict[self.fixture_id]
         except:
             self.team_match = self.team.team_match_dict[self.fixture_id]
+
+        self.opponent = self.opponent_team.name
 
         self.chance_of_playing = player.element_dict['chance_of_playing_next_round']
 

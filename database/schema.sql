@@ -4,6 +4,7 @@ create table players (
     first_name varchar(255),
     surname varchar(255),
     team_id integer not null,
+    team varchar(255),
     current_cost real not null,
     position integer not null
 );
@@ -13,7 +14,8 @@ create table matches (
     player_id integer not null,
     minutes real not null,
     points real not null,
-    gameweek integer not null
+    gameweek integer not null,
+    opponent varchar(255)
 );
 
 create table future_matches (
@@ -21,5 +23,6 @@ create table future_matches (
     player_id integer not null,
     minutes real not null,
     points real not null,
-    gameweek integer
+    gameweek integer,
+    opponent varchar(255)
 );

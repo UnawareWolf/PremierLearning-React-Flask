@@ -4,7 +4,7 @@ import { PlayerMapContext, PlayerFC, PlayerDetail, getPoints } from './Player';
 import { TransferList } from './Transfer';
 import { SetTabCallback } from './Login';
 import './Team.scss';
-import { idText } from 'typescript';
+// import { idText } from 'typescript';
 
 export interface StructuredTeam {
    starters: number[],
@@ -121,7 +121,7 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
    );
 }
 
-interface GwSelectorProps {
+export interface GwSelectorProps {
    gameweeks: number[],
    gw: number,
    setGw: SetGwCallback,
@@ -130,7 +130,7 @@ interface GwSelectorProps {
 
 const selectorStyle = 'general gwToggle';
 
-const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw, points }) => {
+export const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw, points }) => {
 
    let canDecrease: boolean = gameweeks.includes(gw - 1);
    let canIncrease: boolean = gameweeks.includes(gw + 1);
@@ -219,7 +219,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
    return (
       <div id='suggestedTeams'>
          {renderList}
-         {selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} />}
+         {selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} setSelected={setSelectedPlayer} />}
       </div>
    );
 }

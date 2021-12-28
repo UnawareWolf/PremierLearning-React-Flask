@@ -1,4 +1,4 @@
-import { createContext, FC, useContext } from 'react';
+import { createContext, FC, useContext, useState, useCallback } from 'react';
 import { SetSelectedPlayerCallback } from './Team';
 import './Player.scss';
 import { UserTeam, UserTeamContext } from './App';
@@ -13,7 +13,8 @@ const trimName = (nameIn : string) : string => {
 interface Match {
    minutes: number,
    points: number,
-   gameweek: number
+   gameweek: number,
+   opponent: string
 }
 
 interface MatchMap {
@@ -25,6 +26,7 @@ interface Player {
    first_name: string,
    last_name: string,
    team_id: number,
+   team: string,
    current_cost: number,
    position: number,
    matches: MatchMap,
@@ -97,17 +99,31 @@ interface PlayerListProps {
 
 const passFilter = (player: Player, filterText: string): boolean => {
    const name: string = player.first_name + ' ' + player.last_name;
-   console.log(name + ' ' + filterText)
-   return name.includes(filterText);
+   return name.toLowerCase().includes(filterText.toLowerCase());
 }
 
 export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
+   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
+
+   const setSelectedPlayerCallback = useCallback(
+      selectedPlayer => {
+         setSelectedPlayer(selectedPlayer);
+      },
+      []
+   );
+
    console.log(filterText);
    let playerRenders = [];
    for (let i in players) {
       if (i in players && passFilter(players[i], filterText)) {
-         playerRenders.push(<PlayerFC player={players[i]} selected={false}
-            setSelected={null} gw={0} />);
+         if (selectedPlayer !== null && selectedPlayer === players[i].id) {
+            playerRenders.push(<PlayerDetail player={players[i]} setSelected={setSelectedPlayer} />)
+         }
+         else {
+            playerRenders.push(<PlayerFC player={players[i]}
+               selected={false}
+               setSelected={setSelectedPlayerCallback} gw={0} />);
+         }
       }
    }
    return (
@@ -118,17 +134,119 @@ export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
 }
 
 interface PlayerDetailProps {
-   player: Player
+   player: Player,
+   setSelected: SetSelectedPlayerCallback,
 }
 
-export const PlayerDetail: FC<PlayerDetailProps> = ({ player }) => {
+const getMatchesInGW = (player: Player, gw: number): JSX.Element[] => {
+   let matchesInGw = [];
+   let atLeastOne: boolean = false;
+   for (let match in player.matches[gw]) {
+      matchesInGw.push(
+         <tr>
+            <td>{!atLeastOne && gw}</td>
+            <td>{player.matches[gw][match].opponent}</td>
+            <td>{player.matches[gw][match].points}</td>
+            <td>{player.matches[gw][match].minutes}</td>
+            <td>✓</td>
+         </tr>
+      );
+      atLeastOne = true;
+   }
+   for (let match in player.future_matches[gw]) {
+      matchesInGw.push(
+         <tr>
+            <td>{!atLeastOne && gw}</td>
+            <td>{player.future_matches[gw][match].opponent}</td>
+            <td>{player.future_matches[gw][match].points.toFixed(2)}</td>
+            <td>{player.future_matches[gw][match].minutes.toFixed(0)}</td>
+            <td>-</td>
+         </tr>
+      );
+      atLeastOne = true;
+   }
+   if (!atLeastOne) {
+      matchesInGw.push(
+         <tr>
+            <td>{gw}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+         </tr>
+      );
+   }
+   return matchesInGw;
+}
+
+const getPosition = (posId: number): string => {
+   switch(posId){
+      case 1: return 'GKP'
+      case 2: return 'DEF'
+      case 3: return 'MID'
+      default: return 'ATT'
+   }
+}
+
+const sumPoints = (player: Player): number => {
+   let sum: number = 0;
+   for (let gw in player.matches) {
+      sum += getPoints(player.matches[gw]);
+   }
+   return sum;
+}
+
+export const PlayerDetail: FC<PlayerDetailProps> = ({ player, setSelected }) => {
+   const handleClick = () => {
+      setSelected(null);
+   }
+
+   let statTable: JSX.Element[] = [];
+   for (let i: number = 1; i <= 32; i++) {
+      Array.prototype.push.apply(statTable, getMatchesInGW(player, i));
+   }
+   Array.prototype.push.apply(statTable, getMatchesInGW(player, 0));
+
    return (
       <div id='selected'>
          <button className='player playerSelected' >
-            <div>{player.first_name}</div>
-            <div>{player.last_name}</div>
-            <div>{player.current_cost}</div>
-            <div>{JSON.stringify(player.future_matches)}</div>
+            <table id='playerName'>
+               <tr>
+                  <th>{player.first_name}</th>
+                  <th rowSpan={2} id='hideDetail' onClick={handleClick}>X</th>
+               </tr>
+               <tr>
+                  <th>{player.last_name}</th>
+               </tr>
+            </table>
+
+            <table id='playerInfo'>
+               <tr>
+                  <th>Team</th>
+                  <th>Position</th>
+                  <th>Total</th>
+                  <th>Price</th>
+                  <th>Pred</th>
+               </tr>
+               <tr>
+                  <td>{player.team}</td>
+                  <td>{getPosition(player.position)}</td>
+                  <td>{sumPoints(player)}</td>
+                  <td>£{(player.current_cost/10).toFixed(1)}</td>
+                  <td>{getPoints(player.future_matches[0]).toFixed(2)}</td>
+               </tr>
+            </table>
+
+            <table id='playerStats'>
+               <tr>
+                  <td>GW</td>
+                  <td>OPP</td>
+                  <td>Pts</td>
+                  <td>Mins</td>
+                  <td>Played</td>
+               </tr>
+               {statTable}
+            </table>
          </button>
       </div>
    );

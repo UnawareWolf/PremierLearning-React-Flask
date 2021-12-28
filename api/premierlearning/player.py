@@ -11,6 +11,7 @@ class RawPlayer(ABC):
         self.first_name = None
         self.last_name = None
         self.team_id = None
+        self.team_name = None
         self.current_cost = None
         self.position = None
         self.matches = None
@@ -28,6 +29,7 @@ class RawPlayer(ABC):
             self.first_name,
             self.last_name,
             self.team_id,
+            self.team_name,
             self.current_cost,
             self.position
         )
@@ -92,7 +94,7 @@ class Player(RawPlayer):
         
         self.teams = teams
         self.team = teams[int(self.element_dict['team'])]
-
+        self.team_name = self.team.name
         self.team_id = self.team.id
 
         self.populate_matches(teams)

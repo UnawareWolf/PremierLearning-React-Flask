@@ -21,11 +21,48 @@ button.player {
 button.playerSelected {
     border-style: solid;
     border-width: 2px;
-    padding: 6px 14px;
+    // padding: 6px 14px;
+    padding: 0.5rem 0.5rem;
     background-color: $darkColour;
+    cursor: text;
     border-color: $secondaryColour;
 }
 
 span.playerName {
     font-size: small;
+}
+
+th#hideDetail {
+    font-weight: thick;
+    font-size: 24px;
+    border-radius: 6px;
+    text-align: center;
+    width: 3rem;
+    background-color: $primaryColour;
+    cursor: pointer;
+}
+
+th#hideDetail:hover {
+    background-color: $highlightColour;
+}
+
+table {
+    margin-bottom: 1.5rem;
+    border-radius: 2px;
+    padding: 0.25rem;
+    border: 0px;
+}
+
+table#playerInfo {
+    background-color: $primaryColour;
+}
+
+table#playerInfo th {
+    border-bottom: 2px solid $darkColour;
+    border-bottom-color: $darkColour;
+}
+
+table#playerStats {
+    font-size: 10px;
+    margin-bottom: 0px;
 }
