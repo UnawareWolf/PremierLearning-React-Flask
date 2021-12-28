@@ -43,6 +43,8 @@ export const UserTeamContext = createContext<UserTeam>(defaultUserTeam);
 
 // export const JumboContext = createContext<JumboProps>(defaultJumbo);
 
+export const GWContext = createContext<number>(0);
+
 export const UserContext = createContext<User>(defaultUser);
 
 export type SetUserTeamCallback = (userteam: UserTeam) => void;
@@ -52,12 +54,22 @@ interface PlayersState {
    loading: boolean
 }
 
+const getNextGW = (game_events: any[]): number => {
+   for (let event_id in game_events) {
+      if (game_events[event_id].is_current) {
+         return game_events[event_id].id;
+      }
+   }
+   return 0;
+}
+
 function App() {
 
    const [tabSelected, setTabSelected] = useState<string>('default');
    const [{ players, loading }, setPlayers] = useState<PlayersState>({ players: null, loading: true });
    const [user, setUser] = useState<User>(defaultUser);
    const [userTeam, setUserTeam] = useState<UserTeam>(defaultUserTeam);
+   const [gw, setNextGW] = useState<number>(0);
 
    const setUserTeamCallback = useCallback(
       userTeam => {
@@ -82,6 +94,11 @@ function App() {
 
    useEffect(() => {
       setPlayers(state => ({ players: state.players, loading: true }));
+      fetch('api/gw', {
+         method: 'GET'
+      }).then(res => res.json()).then(data => {
+         setNextGW(getNextGW(data.events));
+      });
       fetch('/api/players', {
          method: 'GET'
       }).then(res => res.json()).then(data => {
@@ -109,7 +126,9 @@ function App() {
                            setTab={setTabCallback} />}
                   </UserTeamContext.Provider>
                   {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
-                  {tabSelected === 'default' && <Default />}
+                  <GWContext.Provider value={gw}>
+                     {tabSelected === 'default' && <Default />}
+                  </GWContext.Provider>
                   {tabSelected === 'about' && 'Player point predictions are 100% guaranteed to be accurate.'}
                </PlayerMapContext.Provider>
             </div>

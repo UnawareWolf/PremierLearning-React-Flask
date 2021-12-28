@@ -22,7 +22,7 @@ const SearchZone: FC<SearchProps> = ({ players }) => {
          setFilterText(filterText);
       },
       []
-   )
+   );
 
    return (
       <div className='searchZone'>
@@ -37,7 +37,6 @@ interface SearchBoxProps {
 }
 
 const SearchBox: FC<SearchBoxProps> = ({ setFilterText }) => {
-
    const [inputText, setInputText] = useState<string>('');
 
    const handleClick = () => {

@@ -1,7 +1,7 @@
 import { createContext, FC, useContext, useState, useCallback } from 'react';
 import { SetSelectedPlayerCallback } from './Team';
 import './Player.scss';
-import { UserTeam, UserTeamContext } from './App';
+import { UserTeam, UserTeamContext, GWContext } from './App';
 
 const trimName = (nameIn : string) : string => {
    const maxLen : number = 10;
@@ -112,7 +112,6 @@ export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
       []
    );
 
-   console.log(filterText);
    let playerRenders = [];
    for (let i in players) {
       if (i in players && passFilter(players[i], filterText)) {
@@ -197,6 +196,8 @@ const sumPoints = (player: Player): number => {
 }
 
 export const PlayerDetail: FC<PlayerDetailProps> = ({ player, setSelected }) => {
+   const gw: number = useContext(GWContext);
+
    const handleClick = () => {
       setSelected(null);
    }
@@ -233,7 +234,7 @@ export const PlayerDetail: FC<PlayerDetailProps> = ({ player, setSelected }) => 
                   <td>{getPosition(player.position)}</td>
                   <td>{sumPoints(player)}</td>
                   <td>£{(player.current_cost/10).toFixed(1)}</td>
-                  <td>{getPoints(player.future_matches[0]).toFixed(2)}</td>
+                  <td>{getPoints(player.future_matches[gw]).toFixed(2)}</td>
                </tr>
             </table>
 

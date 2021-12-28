@@ -1,10 +1,12 @@
+import requests
+
 from datetime import datetime
 from flask import Blueprint, request, session
 from flask_cors import CORS
 from squadtools import OptimiseRunner, get_user_jsons
 from persistence import DB_Handler
 
-bp = Blueprint('login', __name__, url_prefix='/')
+bp = Blueprint('login', __name__, url_prefix='/api')
 CORS(bp)
 
 
@@ -19,6 +21,11 @@ def get_all_players():
     players = db_handler.get_player_jsons()
     db_handler.close_connection()
     return {'players': players}
+
+
+@bp.route('/gw', methods=(['GET']))
+def get_current_gw():
+    return requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
 
 
 @bp.route('/team', methods=(['GET']))
