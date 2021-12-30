@@ -32,56 +32,6 @@ div.gwSelector {
     font-size: medium;
 }
 
-// div#teamPage {
-//     display: grid;
-//     grid-template-areas: 'edge1 suggestedTeamsWrapper edge2';
-//     // grid-template-columns: 1fr 4fr 1fr;
-// }
-
-// div#suggestedTeamsWrapper {
-//     grid-area: suggestedTeamsWrapper;
-//     display: grid;
-//     grid-template-areas:
-//         'gwSelector'
-//         'suggestedTeams'
-//         'suggestedTransfers';
-//     justify-items: center;
-//     // grid-template-rows: 1fr 5fr;
-// }
-
-// div#suggestedTeams {
-//     grid-area: suggestedTeams;
-//     display: grid;
-//     grid-template-areas:
-//         'team1'
-//         'team2'
-//         'team3'
-//         'team4'
-//         'subs'
-//         'selected';
-//     justify-items: center;
-//     // grid-template-rows: max-content;
-//     // grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
-// }
-
-// div#suggestedTransfers {
-//     grid-area: suggestedTransfers;
-// }
-
-// div#edge {
-//     grid-area: edge;
-// }
-
-// div.gwSelector {
-//     grid-area: gwSelector;
-//     // height: 6rem;
-// }
-
-// button.gwToggle {
-//     opacity: 0.5;
-//     vertical-align: middle;
-// }
-
 button.hide {
     visibility: hidden;
 }
