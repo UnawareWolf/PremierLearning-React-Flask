@@ -15,7 +15,7 @@ export const Tabs: FC<TabsProps> = ({ selected, tabs, setSelected }) => {
          <div className='tabline'/>
          <div className='tabsolute'>
             {tabs.map((tab) => (
-               <button className={tab === selected ? 'tab selected' : 'tab'} onClick={() => setSelected(tab)} >
+               <button key={tab} className={tab === selected ? 'tab selected' : 'tab'} onClick={() => setSelected(tab)} >
                   {tab}
                </button>
             ))}

@@ -119,14 +119,14 @@ function App() {
             <div id='bottom'>
                {loading && 'loading'}
                <PlayerMapContext.Provider value={players}>
-                  <UserTeamContext.Provider value={userTeam}>
-                     {tabSelected === 'team' &&
-                        <TeamPage userTeam={userTeam}
-                           setUserTeam={setUserTeamCallback}
-                           setTab={setTabCallback} />}
-                  </UserTeamContext.Provider>
-                  {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                   <GWContext.Provider value={gw}>
+                     <UserTeamContext.Provider value={userTeam}>
+                        {tabSelected === 'team' &&
+                           <TeamPage userTeam={userTeam}
+                              setUserTeam={setUserTeamCallback}
+                              setTab={setTabCallback} />}
+                     </UserTeamContext.Provider>
+                     {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
                      {tabSelected === 'default' && <Default />}
                   </GWContext.Provider>
                   {tabSelected === 'about' && 'Player point predictions are 100% guaranteed to be accurate.'}

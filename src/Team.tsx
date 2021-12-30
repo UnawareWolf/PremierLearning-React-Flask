@@ -1,10 +1,9 @@
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { SetUserTeamCallback, UserContext, UserTeam } from './App';
-import { PlayerMapContext, PlayerFC, PlayerDetail, getPoints } from './Player';
+import { PlayerMapContext, PlayerDetail, getPoints, PlayerCard } from './Player';
 import { TransferList } from './Transfer';
 import { SetTabCallback } from './Login';
 import './Team.scss';
-// import { idText } from 'typescript';
 
 export interface StructuredTeam {
    starters: number[],
@@ -73,7 +72,6 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
          loading: true
       });
       fetch('/api/opt', { method: 'GET' }).then(res => res.json()).then(data => {
-         console.log(JSON.stringify(data.suggestedTeams));
          setUserTeam({
             ...userTeam,
             transfers: data.transfers,
@@ -109,6 +107,7 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
                   selectedPlayer={selectedPlayer}
                   setSelectedPlayer={setSelectedPlayerCallback} />
             </div>
+            {players!= null && selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} setSelected={setSelectedPlayer} />}
             <div id='suggestedTransfers'>
                {players != null && userTeam.transfers != null &&
                   <TransferList
@@ -131,19 +130,18 @@ export interface GwSelectorProps {
 const selectorStyle = 'general gwToggle';
 
 export const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw, points }) => {
-
    let canDecrease: boolean = gameweeks.includes(gw - 1);
    let canIncrease: boolean = gameweeks.includes(gw + 1);
 
-   const increase = () => { setGw(gw + 1); }
-   const decrease = () => { setGw(gw - 1); }
+   const increase = () => { canIncrease && setGw(gw + 1); }
+   const decrease = () => { canDecrease && setGw(gw - 1); }
 
    return (
       <div className='gwSelector'>
          <button className={canDecrease ? selectorStyle : selectorStyle + ' hide'} onClick={decrease}>{'<'}</button>
-         {'Gameweek ' + gw}
+         {'GW ' + gw}
          <button className={canIncrease ? selectorStyle : selectorStyle + ' hide'} onClick={increase}>{'>'}</button>
-         <div>{points.toFixed(2)}</div>
+         <div className='predictedPoints'>{'Predicted Points: ' + points.toFixed(0)}</div>
       </div>
    );
 }
@@ -172,17 +170,20 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
 
    suggestedTeams[gw].starters.map((id) => (formation[players[id].position].push(id)));
 
-   let renderList = [];
+   let playerId : number;
+   let teamRender = [];
    for (let i = 1; i <= 4; i++) {
       let currentRow: any = [];
       let rowFRs = '';
       for (let j in formation[i]) {
+         playerId = formation[i][j];
          rowFRs += '1fr ';
          currentRow.push(
-            <div id={divID(formation[i][j])} style={{ gridArea: divID(formation[i][j]) }}>
-               <PlayerFC
-                  player={players[formation[i][j]]}
-                  selected={selectedPlayer === formation[i][j]}
+            <div id={divID(playerId)} style={{ gridArea: divID(playerId) }}>
+               <PlayerCard
+                  key={playerId}
+                  player={players[playerId]}
+                  selected={selectedPlayer === playerId}
                   setSelected={setSelectedPlayer}
                   gw={gw}
                />
@@ -190,7 +191,7 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
          );
       }
       let templateStyle: string = '\'player' + formation[i].join(' player') + '\'';
-      renderList.push(
+      teamRender.push(
          <div id={'team' + i.toString()} style={{ display: 'grid', gridTemplateAreas: templateStyle, gridTemplateColumns: rowFRs }}>
             {currentRow}
          </div>
@@ -198,11 +199,13 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
    }
    let subRow: any = [];
    for (let i in suggestedTeams[gw].bench) {
+      playerId = suggestedTeams[gw].bench[i];
       subRow.push(
-         <div id={divID(suggestedTeams[gw].bench[i])} style={{ gridArea: divID(suggestedTeams[gw].bench[i]) }}>
-            <PlayerFC
-               player={players[suggestedTeams[gw].bench[i]]}
-               selected={selectedPlayer === suggestedTeams[gw].bench[i]}
+         <div id={divID(playerId)} style={{ gridArea: divID(playerId) }}>
+            <PlayerCard
+               key={playerId}
+               player={players[playerId]}
+               selected={selectedPlayer === playerId}
                setSelected={setSelectedPlayer}
                gw={gw}
             />
@@ -210,16 +213,22 @@ const TeamFC: FC<TeamProps> = ({ gw, suggestedTeams, selectedPlayer, setSelected
       );
    }
    let templateStyle: string = '\'player' + suggestedTeams[gw].bench.join(' player') + '\'';
-   renderList.push(
+   
+   let subRender = [];
+   subRender.push(
       <div id='subs' style={{ display: 'grid', gridTemplateAreas: templateStyle, gridTemplateColumns: 'fr fr fr fr' }}>
          {subRow}
       </div>
    );
 
    return (
-      <div id='suggestedTeams'>
-         {renderList}
-         {selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} setSelected={setSelectedPlayer} />}
+      <div>
+         <div id='suggestedTeams'>
+            {teamRender}
+         </div>
+         <div id='subs'>
+            {subRender}
+         </div>
       </div>
    );
 }

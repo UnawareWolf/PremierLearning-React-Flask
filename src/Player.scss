@@ -1,31 +1,89 @@
 @import 'common.scss';
 
-button.player {
+@mixin player {
     background-color: $darkColour;
     border-radius: 6px;
     color: white;
-    border: 0px;
     padding: 0.25rem 0.5rem;
     outline: none;
     cursor: pointer;
-    margin: 0.25rem;
     text-decoration: none;
-    text-align: left;
-    width: 16rem;
-    // height: 4rem;
     vertical-align: top;
     word-break: break-word;
     display: grid;
 }
 
-button.playerSelected {
+@mixin list {
+    text-align: left;
+    font-size: small;
+    width: 15rem;
+}
+
+@mixin selected {
     border-style: solid;
-    border-width: 2px;
-    // padding: 6px 14px;
-    padding: 0.5rem 0.5rem;
-    background-color: $darkColour;
-    cursor: text;
+    border-width: 0.125rem;
+    margin: 0.125rem;
     border-color: $secondaryColour;
+}
+
+div.player {
+    @include player;
+    @include list;
+    margin: 0.25rem;
+    border: 0px;
+}
+
+div.playerSelected {
+    @include player;
+    @include selected;
+    @include list;
+    cursor: text;
+}
+
+@mixin card {
+    text-align: center;
+    font-size: small;
+}
+
+div.playerCard {
+    @include player;
+    @include card;
+    width: 8rem;
+    margin: 0.25rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: 0px;
+}
+
+div.cardSelected {
+    @include player;
+    @include selected;
+    @include card;
+    width: 8rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-color: $highlightColour;
+    padding: 0.125rem 0.5rem;
+}
+
+div.cardHouse {
+    display: grid;
+    justify-items: center;
+}
+
+div.pointsCard {
+    @include player;
+    @include card;
+    margin-top: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    width: 6rem;
+    font-size: small;
+    background-color: white;
+    color: $darkColour;
+    cursor: text;
+    padding: 0px;
+    padding-bottom: 0.125rem;
 }
 
 span.playerName {
@@ -65,4 +123,19 @@ table#playerInfo th {
 table#playerStats {
     font-size: 10px;
     margin-bottom: 0px;
+}
+
+img.center {
+    display: block;
+    margin: auto;
+}
+
+div.imgContainer {
+    display: block;
+    height: 4rem;
+    overflow: hidden;
+}
+
+img.card {
+    width: 6rem;
 }

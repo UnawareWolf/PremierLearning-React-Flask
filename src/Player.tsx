@@ -66,12 +66,40 @@ export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw })
    }
 
    return (
-      <button className={selected ? 'player playerSelected' : 'player'} onClick={handleClick} >
+      <div className={selected ? 'playerSelected' : 'player'} onClick={handleClick} >
          {`${trimName(player.first_name)}  ${trimName(player.last_name)}`}
          {isCaptain(userTeam, player.id, gw) && '\n(C)'}
          {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
          {/* {'\n' + getPoints(player.future_matches[gw]).toFixed(2)} */}
-      </button>
+      </div>
+   );
+}
+
+export const PlayerCard: FC<PlayerProps> = ({ player, selected, setSelected, gw }) => {
+   const userTeam = useContext(UserTeamContext);
+
+   const handleClick = () => {
+      if (setSelected === null) return;
+      selected ? setSelected(null) : setSelected(player.id);
+   }
+
+   return (
+      <div className='cardHouse'>
+         <div className='imgContainer'>
+            <img className='center card' src={'https://resources.premierleague.com/premierleague/photos/players/110x140/p' + player.code + '.png'} alt='' />
+         </div>
+         <div className={selected ? 'cardSelected' : 'playerCard'} onClick={handleClick} >
+            {`${trimName(player.last_name)}`}
+            {isCaptain(userTeam, player.id, gw) && '\n(C)'}
+            {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
+            {/* {'\n' + getPoints(player.future_matches[gw]).toFixed(2)} */}
+         </div>
+         <div className='pointsCard'>
+            {'\n' +
+               getPoints(player.future_matches[gw]).toFixed(2) + ' ' +
+               listOpponents(player.future_matches[gw])}
+         </div>
+      </div>
    );
 }
 
@@ -117,10 +145,11 @@ export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
    for (let i in players) {
       if (i in players && passFilter(players[i], filterText)) {
          if (selectedPlayer !== null && selectedPlayer === players[i].id) {
-            playerRenders.push(<PlayerDetail player={players[i]} setSelected={setSelectedPlayer} />)
+            playerRenders.push(<PlayerDetail key={players[i].id}
+               player={players[i]} setSelected={setSelectedPlayer} />)
          }
          else {
-            playerRenders.push(<PlayerFC player={players[i]}
+            playerRenders.push(<PlayerFC key={players[i].id} player={players[i]}
                selected={false}
                setSelected={setSelectedPlayerCallback} gw={0} />);
          }
@@ -138,42 +167,62 @@ interface PlayerDetailProps {
    setSelected: SetSelectedPlayerCallback,
 }
 
+interface MatchRowProps {
+   gw: string,
+   opponent: string,
+   points: string,
+   minutes: string,
+   played: string
+}
+
+const MatchRow: FC<MatchRowProps> = (props: MatchRowProps) => {
+   return(
+      <tr>
+         <td>{props.gw}</td>
+         <td>{props.opponent}</td>
+         <td>{props.points}</td>
+         <td>{props.minutes}</td>
+         <td>{props.played}</td>
+      </tr>
+   );
+}
+
 const getMatchesInGW = (player: Player, gw: number): JSX.Element[] => {
    let matchesInGw = [];
    let atLeastOne: boolean = false;
    for (let match in player.matches[gw]) {
       matchesInGw.push(
-         <tr>
-            <td>{!atLeastOne && gw}</td>
-            <td>{player.matches[gw][match].opponent}</td>
-            <td>{player.matches[gw][match].points}</td>
-            <td>{player.matches[gw][match].minutes}</td>
-            <td>✓</td>
-         </tr>
+         <MatchRow
+            gw={atLeastOne ? '' : gw.toString()} 
+            opponent={player.matches[gw][match].opponent}
+            points={player.matches[gw][match].points.toString()}
+            minutes={player.matches[gw][match].minutes.toString()}
+            played='✓'
+         />
       );
       atLeastOne = true;
    }
    for (let match in player.future_matches[gw]) {
       matchesInGw.push(
-         <tr>
-            <td>{!atLeastOne && gw}</td>
-            <td>{player.future_matches[gw][match].opponent}</td>
-            <td>{player.future_matches[gw][match].points.toFixed(2)}</td>
-            <td>{player.future_matches[gw][match].minutes.toFixed(0)}</td>
-            <td>-</td>
-         </tr>
+         <MatchRow
+            gw={atLeastOne ? '' : gw.toString()} 
+            opponent={player.future_matches[gw][match].opponent}
+            points={player.future_matches[gw][match].points.toFixed(2).toString()}
+            minutes={player.future_matches[gw][match].minutes.toFixed(0).toString()}
+            played='-'
+         />
       );
       atLeastOne = true;
    }
    if (!atLeastOne) {
       matchesInGw.push(
-         <tr>
-            <td>{gw}</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-         </tr>
+         <MatchRow
+            gw={gw.toString()}
+            opponent='-'
+            points='-'
+            minutes='-'
+            played='-'
+         />
       );
    }
    return matchesInGw;
@@ -204,54 +253,60 @@ export const PlayerDetail: FC<PlayerDetailProps> = ({ player, setSelected }) => 
    }
 
    let statTable: JSX.Element[] = [];
-   for (let i: number = 1; i <= 32; i++) {
+   for (let i: number = 1; i <= 38; i++) {
       Array.prototype.push.apply(statTable, getMatchesInGW(player, i));
    }
    Array.prototype.push.apply(statTable, getMatchesInGW(player, 0));
 
    return (
       <div id='selected'>
-         <button className='player playerSelected' >
+         <div className='player playerSelected' >
             <table id='playerName'>
-               <tr>
-                  <th>{player.first_name}</th>
-                  <th rowSpan={2} id='hideDetail' onClick={handleClick}>X</th>
-               </tr>
-               <tr>
-                  <th>{player.last_name}</th>
-               </tr>
+               <tbody>
+                  <tr>
+                     <th>{player.first_name}</th>
+                     <th rowSpan={2} id='hideDetail' onClick={handleClick}>X</th>
+                  </tr>
+                  <tr>
+                     <th>{player.last_name}</th>
+                  </tr>
+               </tbody>
             </table>
             
-            <img src={'https://resources.premierleague.com/premierleague/photos/players/110x140/p' + player.code + '.png'} />
+            <img className='center' src={'https://resources.premierleague.com/premierleague/photos/players/110x140/p' + player.code + '.png'} alt='' />
 
             <table id='playerInfo'>
-               <tr>
-                  <th>Team</th>
-                  <th>Position</th>
-                  <th>Total</th>
-                  <th>Price</th>
-                  <th>Pred</th>
-               </tr>
-               <tr>
-                  <td>{player.team}</td>
-                  <td>{getPosition(player.position)}</td>
-                  <td>{sumPoints(player)}</td>
-                  <td>£{(player.current_cost/10).toFixed(1)}</td>
-                  <td>{getPoints(player.future_matches[gw]).toFixed(2)}</td>
-               </tr>
+               <tbody>
+                  <tr>
+                     <th>Team</th>
+                     <th>Position</th>
+                     <th>Total</th>
+                     <th>Price</th>
+                     <th>Pred</th>
+                  </tr>
+                  <tr>
+                     <td>{player.team}</td>
+                     <td>{getPosition(player.position)}</td>
+                     <td>{sumPoints(player)}</td>
+                     <td>£{(player.current_cost/10).toFixed(1)}</td>
+                     <td>{getPoints(player.future_matches[gw]).toFixed(2)}</td>
+                  </tr>
+               </tbody>
             </table>
 
             <table id='playerStats'>
-               <tr>
-                  <td>GW</td>
-                  <td>OPP</td>
-                  <td>Pts</td>
-                  <td>Mins</td>
-                  <td>Played</td>
-               </tr>
-               {statTable}
+               <tbody>
+                  <tr>
+                     <td>GW</td>
+                     <td>OPP</td>
+                     <td>Pts</td>
+                     <td>Mins</td>
+                     <td>Played</td>
+                  </tr>
+                  {statTable}
+               </tbody>
             </table>
-         </button>
+         </div>
       </div>
    );
 }
@@ -262,4 +317,17 @@ export const getPoints = (matches: Match[]): number => {
       sum += matches[match].points;
    }
    return sum;
+}
+
+const listOpponents = (matches: Match[]): string => {
+   if (matches === undefined || matches.length === 0) {
+      return '(-)';
+   }
+   let opps: string = '(';
+   for (let match in matches) {
+      opps += matches[match].opponent + ', ';
+   }
+   opps = opps.substring(0, opps.length - 2);
+   opps += ')';
+   return opps;
 }

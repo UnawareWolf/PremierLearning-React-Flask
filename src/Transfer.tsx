@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { PlayerMap, PlayerName, } from './Player';
+import { getPoints, PlayerMap, PlayerName, } from './Player';
 import './Transfer.scss';
 import { SetSelectedPlayerCallback } from './Team';
 
@@ -13,20 +13,33 @@ export interface TransferMap {
 }
 
 interface TransferProps {
+   gw: number,
    players: PlayerMap,
    transfer: Transfer,
    setSelectedPlayer: SetSelectedPlayerCallback
 }
 
-const TranserFC: FC<TransferProps> = ({ players, transfer, setSelectedPlayer }) => {
+const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer }) => {
    return (
-      <div className='transfer' >
+      <tr className='transfer'>
+         <td>
+            {gw}
+         </td>
+         <td>
             <PlayerName player={players[transfer.id_out]} selected={false}
                setSelected={setSelectedPlayer} />
-            {' > '}
+         </td>
+         <td>
+            {getPoints(players[transfer.id_out].future_matches[gw]).toFixed(2)}
+         </td>
+         <td>
             <PlayerName player={players[transfer.id_in]} selected={false}
                setSelected={setSelectedPlayer} />
-      </div>
+         </td>
+         <td>
+            {getPoints(players[transfer.id_in].future_matches[gw]).toFixed(2)}
+         </td>
+      </tr>
    );
 }
 
@@ -39,17 +52,28 @@ interface TransferListProps {
 export const TransferList: FC<TransferListProps> = ({ players, transfers, setSelectedPlayer }) => {
    let transferRenders = [];
    for (let i in transfers) {
-      transferRenders.push(<div>{'Gameweek ' + i}</div>);
       for (let j in transfers[i]) {
          transferRenders.push(
-            <TranserFC players={players} transfer={transfers[i][j]} 
+            <TranserFC gw={Number.parseInt(i)} players={players} transfer={transfers[i][j]} 
                setSelectedPlayer={setSelectedPlayer} />
          );
       }
    }
    return (
-      <div>
-         {transferRenders}
+      <div className='transferList'>
+         Suggested Transfers
+         <table className='transferTable'>
+            <tbody>
+               <tr>
+                  <th>GW</th>
+                  <th>Player Out →</th>
+                  <th></th>
+                  <th>Player In ←</th>
+                  <th></th>
+               </tr>
+               {transferRenders}
+            </tbody>
+         </table>
       </div>
    );
 }
