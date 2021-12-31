@@ -31,3 +31,17 @@ div.transferList {
 table.transferTable {
     @include teamTable;
 }
+
+@media only screen and (max-width: 560px) {
+    table.transferTable {
+        margin: 0.25rem;
+
+        td {
+            font-size: 8px;
+        }
+    
+        th {
+            font-size: 8px;
+        }
+    }
+}

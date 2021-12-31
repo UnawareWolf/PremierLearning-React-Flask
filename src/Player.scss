@@ -84,6 +84,8 @@ div.pointsCard {
     cursor: text;
     padding: 0px;
     padding-bottom: 0.125rem;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 span.playerName {
@@ -181,5 +183,8 @@ img.card {
     div.pointsCard {
         width: 2rem;
         font-size: 6px;
+    }
+    span.playerName {
+        font-size: 8px;
     }
 }
