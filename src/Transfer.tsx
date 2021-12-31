@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { getPoints, PlayerMap, PlayerName, } from './Player';
+import { getPoints, PlayerMap, PlayerName, Player } from './Player';
 import './Transfer.scss';
 import { SetSelectedPlayerCallback } from './Team';
 
@@ -20,14 +20,36 @@ interface TransferProps {
 }
 
 const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer }) => {
+   const getPlayerTransferCells = (player: Player): JSX.Element[] => {
+      let transferItem: JSX.Element[] = [];
+      transferItem.push(
+         <td>
+            <PlayerName player={player} selected={false}
+               setSelected={setSelectedPlayer} />
+         </td>
+      );
+      transferItem.push(
+         <td>£{(player.current_cost / 10).toFixed(1)}</td>
+      );
+      transferItem.push(
+         <td>{getPoints(player.future_matches[gw]).toFixed(2)}</td>
+      );
+      return transferItem;
+   }
+   
    return (
       <tr className='transfer'>
          <td>
             {gw}
          </td>
-         <td>
+         {getPlayerTransferCells(players[transfer.id_out])}
+         {getPlayerTransferCells(players[transfer.id_in])}
+         {/* <td>
             <PlayerName player={players[transfer.id_out]} selected={false}
                setSelected={setSelectedPlayer} />
+         </td>
+         <td>
+            {(players[transfer.id_out].current_cost / 10).toFixed(1)}
          </td>
          <td>
             {getPoints(players[transfer.id_out].future_matches[gw]).toFixed(2)}
@@ -37,8 +59,11 @@ const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer
                setSelected={setSelectedPlayer} />
          </td>
          <td>
-            {getPoints(players[transfer.id_in].future_matches[gw]).toFixed(2)}
+            {(players[transfer.id_in].current_cost / 10).toFixed(1)}
          </td>
+         <td>
+            {getPoints(players[transfer.id_in].future_matches[gw]).toFixed(2)}
+         </td> */}
       </tr>
    );
 }
@@ -66,10 +91,12 @@ export const TransferList: FC<TransferListProps> = ({ players, transfers, setSel
             <tbody>
                <tr>
                   <th>GW</th>
-                  <th>Player Out →</th>
-                  <th></th>
-                  <th>Player In ←</th>
-                  <th></th>
+                  <th>Player Out</th>
+                  <th>→</th>
+                  <th>→</th>
+                  <th>Player In</th>
+                  <th>←</th>
+                  <th>←</th>
                </tr>
                {transferRenders}
             </tbody>

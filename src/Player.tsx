@@ -21,7 +21,7 @@ interface MatchMap {
    [gameweek: number]: Match[]
 }
 
-interface Player {
+export interface Player {
    id: number,
    first_name: string,
    last_name: string,
@@ -70,7 +70,6 @@ export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw })
          {`${trimName(player.first_name)}  ${trimName(player.last_name)}`}
          {isCaptain(userTeam, player.id, gw) && '\n(C)'}
          {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
-         {/* {'\n' + getPoints(player.future_matches[gw]).toFixed(2)} */}
       </div>
    );
 }
@@ -92,7 +91,6 @@ export const PlayerCard: FC<PlayerProps> = ({ player, selected, setSelected, gw 
             {`${trimName(player.last_name)}`}
             {isCaptain(userTeam, player.id, gw) && '\n(C)'}
             {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
-            {/* {'\n' + getPoints(player.future_matches[gw]).toFixed(2)} */}
          </div>
          <div className='pointsCard'>
             {'\n' +
