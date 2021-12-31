@@ -6,7 +6,7 @@ from flask_cors import CORS
 from squadtools import OptimiseRunner, get_user_jsons
 from persistence import DB_Handler
 
-bp = Blueprint('login', __name__, url_prefix='/api')
+bp = Blueprint('login', __name__, url_prefix='/')
 CORS(bp)
 
 

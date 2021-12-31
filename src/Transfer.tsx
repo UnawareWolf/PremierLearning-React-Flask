@@ -44,26 +44,6 @@ const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer
          </td>
          {getPlayerTransferCells(players[transfer.id_out])}
          {getPlayerTransferCells(players[transfer.id_in])}
-         {/* <td>
-            <PlayerName player={players[transfer.id_out]} selected={false}
-               setSelected={setSelectedPlayer} />
-         </td>
-         <td>
-            {(players[transfer.id_out].current_cost / 10).toFixed(1)}
-         </td>
-         <td>
-            {getPoints(players[transfer.id_out].future_matches[gw]).toFixed(2)}
-         </td>
-         <td>
-            <PlayerName player={players[transfer.id_in]} selected={false}
-               setSelected={setSelectedPlayer} />
-         </td>
-         <td>
-            {(players[transfer.id_in].current_cost / 10).toFixed(1)}
-         </td>
-         <td>
-            {getPoints(players[transfer.id_in].future_matches[gw]).toFixed(2)}
-         </td> */}
       </tr>
    );
 }
