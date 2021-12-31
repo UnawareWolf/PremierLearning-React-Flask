@@ -48,3 +48,10 @@ div.teamInfo {
 table.teamInfoTable {
     @include teamTable;
 }
+
+@media only screen and (max-width: 560px) {
+    div#suggestedTeams {
+        padding: 0.5rem 1.8rem;
+        margin: 0.5rem;
+    }
+}

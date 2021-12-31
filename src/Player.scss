@@ -162,3 +162,24 @@ img.card {
         font-size: 8px;
     }
 }
+
+@media only screen and (max-width: 560px) {
+    div.playerCard {
+        font-size: 6px;
+        width: 3rem;
+    }
+    div.cardSelected {
+        font-size: 6px;
+        width: 3rem;
+    }
+    img.card {
+        width: 2rem;
+    }
+    div.imgContainer {
+        height: 1.5rem;
+    }
+    div.pointsCard {
+        width: 2rem;
+        font-size: 6px;
+    }
+}
