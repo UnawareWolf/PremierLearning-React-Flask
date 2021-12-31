@@ -142,8 +142,12 @@ img.card {
 }
 
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 960px) {
     div.playerCard {
+        font-size: 8px;
+        width: 4rem;
+    }
+    div.cardSelected {
         font-size: 8px;
         width: 4rem;
     }

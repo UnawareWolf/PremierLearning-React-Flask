@@ -16,10 +16,11 @@ interface TransferProps {
    gw: number,
    players: PlayerMap,
    transfer: Transfer,
+   sellingPrices: Map<number, number>,
    setSelectedPlayer: SetSelectedPlayerCallback
 }
 
-const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer }) => {
+const TranserFC: FC<TransferProps> = ({ gw, players, transfer, sellingPrices, setSelectedPlayer }) => {
    const getPlayerTransferCells = (player: Player): JSX.Element[] => {
       let transferItem: JSX.Element[] = [];
       transferItem.push(
@@ -28,8 +29,9 @@ const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer
                setSelected={setSelectedPlayer} />
          </td>
       );
+      let sellingPrice: number | undefined = sellingPrices.get(player.id);
       transferItem.push(
-         <td>£{(player.current_cost / 10).toFixed(1)}</td>
+         <td>£{((sellingPrice != undefined ? sellingPrice : (player.current_cost)) / 10).toFixed(1)}</td>
       );
       transferItem.push(
          <td>{getPoints(player.future_matches[gw]).toFixed(2)}</td>
@@ -51,16 +53,17 @@ const TranserFC: FC<TransferProps> = ({ gw, players, transfer, setSelectedPlayer
 interface TransferListProps {
    players: PlayerMap,
    transfers: TransferMap,
+   sellingPrices: Map<number, number>,
    setSelectedPlayer: SetSelectedPlayerCallback
 }
 
-export const TransferList: FC<TransferListProps> = ({ players, transfers, setSelectedPlayer }) => {
+export const TransferList: FC<TransferListProps> = ({ players, transfers, sellingPrices, setSelectedPlayer }) => {
    let transferRenders = [];
    for (let i in transfers) {
       for (let j in transfers[i]) {
          transferRenders.push(
             <TranserFC gw={Number.parseInt(i)} players={players} transfer={transfers[i][j]} 
-               setSelectedPlayer={setSelectedPlayer} />
+               sellingPrices={sellingPrices} setSelectedPlayer={setSelectedPlayer} />
          );
       }
    }

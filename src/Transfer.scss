@@ -8,22 +8,26 @@ div.transferList {
     font-weight: bold;
 }
 
-table.transferTable {
+@mixin teamTable {
     border: 1px solid white;
     background-color: $darkColour;
     margin: 1rem;
     padding: 0.25rem;
     text-align: left;
+
+    td {
+        font-weight: normal;
+        font-size: small;
+        padding: 0.25rem 0.5rem;
+    }
+
+    th {
+        font-weight: bold;
+        font-size: medium;
+        padding: 0.25rem 0.5rem;
+    }
 }
 
-table.transferTable td {
-    font-weight: normal;
-    font-size: small;
-    padding: 0.25rem;
-}
-
-table.transferTable th {
-    font-weight: bold;
-    font-size: medium;
-    padding: 0.25rem;
+table.transferTable {
+    @include teamTable;
 }

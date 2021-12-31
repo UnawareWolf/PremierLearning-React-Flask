@@ -99,7 +99,7 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
                   <GwSelector
                      gameweeks={Object.keys(userTeam.suggestedTeams).map(Number)}
                      gw={selectedGw}
-                     setGw={setGwCallback}
+                     setGw={setGwCallback} 
                      points={gwPoints} />}
                <TeamFC
                   gw={selectedGw}
@@ -108,11 +108,15 @@ export const TeamPage: FC<TeamPageProps> = ({ userTeam, setUserTeam, setTab }) =
                   setSelectedPlayer={setSelectedPlayerCallback} />
             </div>
             {players!= null && selectedPlayer !== null && <PlayerDetail player={players[selectedPlayer]} setSelected={setSelectedPlayer} />}
+            {userTeam.teamInfo !== null &&
+                  <TeamInfo value={userTeam.teamInfo.value} bank={userTeam.teamInfo.bank} />}
             <div id='suggestedTransfers'>
-               {players != null && userTeam.transfers != null &&
+               {players !== null && userTeam.transfers !== null &&
+                  userTeam.teamInfo !== null && userTeam.teamInfo.sellingPrices !== null &&
                   <TransferList
                      players={players}
                      transfers={userTeam.transfers}
+                     sellingPrices={userTeam.teamInfo.sellingPrices}
                      setSelectedPlayer={setSelectedPlayerCallback} />}
             </div>
          </div>
@@ -141,7 +145,32 @@ export const GwSelector: FC<GwSelectorProps> = ({ gameweeks, gw, setGw, points }
          <button className={canDecrease ? selectorStyle : selectorStyle + ' hide'} onClick={decrease}>{'<'}</button>
          {'GW ' + gw}
          <button className={canIncrease ? selectorStyle : selectorStyle + ' hide'} onClick={increase}>{'>'}</button>
-         <div className='predictedPoints'>{'Predicted Points: ' + points.toFixed(0)}</div>
+         <div className='pointTotal'>{points.toFixed(0) + ' Points'}</div>
+      </div>
+   );
+}
+
+interface TeamInfoProps {
+   value: number,
+   bank: number
+}
+
+const TeamInfo: FC<TeamInfoProps> = ({ value, bank }) => {
+   return (
+      <div className='teamInfo'>
+         <div>Team Info</div>
+         <table className='teamInfoTable'>
+            <tbody>
+               <tr>
+                  <th>Squad Value</th>
+                  <td>{'£' + value}</td>
+               </tr>
+               <tr>
+                  <th>Budget</th>
+                  <td>{'£' + bank}</td>
+               </tr>
+            </tbody>
+         </table>
       </div>
    );
 }

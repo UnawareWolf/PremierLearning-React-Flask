@@ -13,8 +13,15 @@ export interface User {
    loggedIn: boolean
 }
 
+export interface TeamInfo {
+   sellingPrices: Map<number, number> | null,
+   value: number,
+   bank: number
+}
+
 export interface UserTeam {
    teamIDs: number[] | null,
+   teamInfo: TeamInfo | null,
    suggestedTeams: TeamMap | null,
    transfers: TransferMap | null,
    loading: boolean
@@ -27,21 +34,13 @@ export const defaultUser: User = {
 
 export const defaultUserTeam: UserTeam = {
    teamIDs: null,
+   teamInfo: null,
    suggestedTeams: null,
    transfers: null,
    loading: false
 }
 
 export const UserTeamContext = createContext<UserTeam>(defaultUserTeam);
-
-// interface JumboProps {
-//    user: User,
-//    userTeam: UserTeam,
-   
-
-// }
-
-// export const JumboContext = createContext<JumboProps>(defaultJumbo);
 
 export const GWContext = createContext<number>(0);
 
@@ -110,7 +109,6 @@ function App() {
 
    return (
       <div className="App">
-
          <UserContext.Provider value={user}>
             <div id='top'>
                <Tabs selected={tabSelected} setSelected={setTabCallback} tabs={tabs} />

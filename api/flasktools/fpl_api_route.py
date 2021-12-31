@@ -42,7 +42,7 @@ def login():
     request_data = request.get_json()
 
     session['user_json'] = get_user_jsons(request_data['username'], request_data['password'])
-    return {'user': session['user_json']['user']}
+    return {'user_json': session['user_json']}
 
 
 @bp.route('/logout', methods=(['GET']))

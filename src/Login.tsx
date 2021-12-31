@@ -1,5 +1,5 @@
 import { FC, useContext, useState } from 'react';
-import { User, UserContext, defaultUserTeam, SetUserTeamCallback } from './App';
+import { User, UserContext, defaultUserTeam, SetUserTeamCallback, TeamInfo } from './App';
 
 type SetUserCallback = (user: User) => void;
 
@@ -84,11 +84,11 @@ const LoginForm: FC<LoginProps> = ({ setUser, setUserTeam, setTab }) => {
             loggingIn: false
          });
          setUser({
-            name: data.user.name,
-            loggedIn: data.user.loggedIn
+            name: data.user_json.user.name,
+            loggedIn: data.user_json.user.loggedIn
             
          });
-         if (!data.user.loggedIn) {
+         if (!data.user_json.user.loggedIn) {
             setLoginState({
                ...loginState,
                fail: true
@@ -96,8 +96,19 @@ const LoginForm: FC<LoginProps> = ({ setUser, setUserTeam, setTab }) => {
             setPassword('');
          }
          else {
+            let priceMap: Map<number, number> = new Map<number, number>();
+            let picks = data.user_json.fpl_api.picks.picks;
+            for (let pickIdx in picks) {
+               priceMap.set(picks[pickIdx].element, picks[pickIdx].selling_price);
+            }
+            let info: TeamInfo = {
+               sellingPrices: priceMap,
+               value: data.user_json.fpl_api.picks.transfers.value / 10,
+               bank: data.user_json.fpl_api.picks.transfers.bank / 10,
+            };
             setUserTeam({
-               teamIDs: data.user.teamIDs,
+               teamIDs: data.user_json.user.teamIDs,
+               teamInfo: info,
                suggestedTeams: null,
                transfers: null,
                loading: false
