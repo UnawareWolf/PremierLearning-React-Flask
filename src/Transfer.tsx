@@ -31,7 +31,7 @@ const TranserFC: FC<TransferProps> = ({ gw, players, transfer, sellingPrices, se
       );
       let sellingPrice: number | undefined = sellingPrices.get(player.id);
       transferItem.push(
-         <td>£{((sellingPrice != undefined ? sellingPrice : (player.current_cost)) / 10).toFixed(1)}</td>
+         <td>£{((sellingPrice !== undefined ? sellingPrice : (player.current_cost)) / 10).toFixed(1)}</td>
       );
       transferItem.push(
          <td>{getPoints(player.future_matches[gw]).toFixed(2)}</td>

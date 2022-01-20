@@ -15,7 +15,7 @@ FANTASY_API = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 FIXTURES_API = 'https://fantasy.premierleague.com/api/fixtures/'
 PLAYER_API = 'https://fantasy.premierleague.com/api/element-summary/%i/'
 QUICK_RUN = False
-ALWAYS_UPDATE = False
+ALWAYS_UPDATE = True
 
 
 class Runner:
@@ -121,8 +121,6 @@ class Runner:
                     if season.years[0] - 1 in player.history_past:
                         player_last_season.points_per_min_last_season = player.history_past[season.years[0] - 1]
                         player_last_season.played_last_season = True
-
-        print()
     
     def process_player_matches(self):
         # last_szn = next(szn for szn in self.past_seasons if szn.years[0] == self.current_season.years[0] - 1)
@@ -136,7 +134,6 @@ class Runner:
         for season in self.past_seasons:
             for player in season.players:
                 player.process_matches()
-
 
     def populate_formatted_match_data(self):
         self.populate_learning_inputs_for_season(self.current_season)

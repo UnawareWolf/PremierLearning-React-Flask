@@ -40,6 +40,12 @@ export const defaultUserTeam: UserTeam = {
    loading: false
 }
 
+interface TeamArray {
+   [team_id: number]: string;
+}
+
+export const TeamsContext = createContext<TeamArray>([]);
+
 export const UserTeamContext = createContext<UserTeam>(defaultUserTeam);
 
 export const GWContext = createContext<number>(0);
@@ -69,6 +75,7 @@ function App() {
    const [user, setUser] = useState<User>(defaultUser);
    const [userTeam, setUserTeam] = useState<UserTeam>(defaultUserTeam);
    const [gw, setNextGW] = useState<number>(0);
+   const [teams, setTeams] = useState<TeamArray>([]);
 
    const setUserTeamCallback = useCallback(
       userTeam => {
@@ -93,9 +100,14 @@ function App() {
 
    useEffect(() => {
       setPlayers(state => ({ players: state.players, loading: true }));
-      fetch('api/gw', {
+      fetch('api/general', {
          method: 'GET'
       }).then(res => res.json()).then(data => {
+         let apiTeams: TeamArray = [];
+         for (let i in data.teams) {
+            apiTeams[data.teams[i].id] = data.teams[i].short_name;
+         }
+         setTeams(apiTeams);
          setNextGW(getNextGW(data.events));
       });
       fetch('/api/players', {
@@ -125,7 +137,9 @@ function App() {
                               setTab={setTabCallback} />}
                      </UserTeamContext.Provider>
                      {tabSelected === 'login' && <Login setUser={setUserCallback} setUserTeam={setUserTeamCallback} setTab={setTabCallback} />}
-                     {tabSelected === 'default' && <Default />}
+                     <TeamsContext.Provider value={teams}>
+                        {tabSelected === 'default' && <Default />}
+                     </TeamsContext.Provider>
                   </GWContext.Provider>
                   {tabSelected === 'about' && 'Player point predictions are 100% guaranteed to be accurate.'}
                </PlayerMapContext.Provider>

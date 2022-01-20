@@ -23,7 +23,7 @@ def get_all_players():
     return {'players': players}
 
 
-@bp.route('/gw', methods=(['GET']))
+@bp.route('/general', methods=(['GET']))
 def get_current_gw():
     return requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
 

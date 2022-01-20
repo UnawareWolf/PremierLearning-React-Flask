@@ -1,0 +1,109 @@
+@import 'common.scss';
+@import './Player.scss';
+
+@mixin filter {
+    @include player;
+    @include list;
+    margin: 0.25rem;
+    margin-bottom: 0;
+}
+
+div#filterHouse {
+    display: grid;
+    width: 16.75rem;
+    justify-content: right;
+}
+
+div#filter {
+    @include filter;
+    display: grid;
+    font-weight: bold;
+    justify-self: right;
+    width: auto;
+}
+
+div#expandedFilter {
+    @include filter;
+    @include selected;
+    text-align: left;
+    width: 15rem;
+}
+
+div.close {
+    @include close;
+    margin: 0.5rem 0rem;
+    justify-self: right;
+    font-weight: bold;
+    line-height: 2.5rem;
+}
+
+div.close:hover {
+    background-color: $highlightColour;
+}
+
+div.teamGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    justify-items: center;
+    margin: 0.25rem;
+    width: 100%;
+}
+
+@mixin filterBtn {
+    background-color: $primaryColour;
+    margin-top: 0.25rem;
+    border-radius: 3px;
+    text-align: center;
+    border: solid;
+    border-width: 0.125rem;
+    border-color: $primaryColour;
+}
+
+div.teamFilter {
+    width: 2.5rem;
+    @include filterBtn;
+}
+
+div.posGrid {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    justify-items: left;
+    margin: 0.25rem;
+    width: 100%;
+}
+
+div.posFilter {
+    width: 2.5rem;
+    @include filterBtn;
+}
+
+div.filterHeading {
+    font-size: large;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+div.sortGrid {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    justify-items: left;
+    margin: 0.25rem;
+    width: 100%;
+}
+
+div.sortOption {
+    padding: 0rem 0.25rem;
+    @include filterBtn;
+}
+
+div.selected {
+    border-color: $secondaryColour;
+}
+
+div.reset {
+    padding: 0rem 0.25rem;
+    justify-content: right;
+    @include filterBtn;
+    margin: 0.25rem;
+}

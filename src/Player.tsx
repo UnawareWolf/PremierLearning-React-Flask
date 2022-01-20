@@ -2,6 +2,7 @@ import { createContext, FC, useContext, useState, useCallback } from 'react';
 import { SetSelectedPlayerCallback } from './Team';
 import './Player.scss';
 import { UserTeam, UserTeamContext, GWContext } from './App';
+import { FilterOptions, SortOptions, SortOption } from './Default';
 
 const trimName = (nameIn : string) : string => {
    const maxLen : number = 10;
@@ -54,10 +55,11 @@ interface PlayerProps {
    player: Player,
    selected: boolean,
    setSelected: SetSelectedPlayerCallback | null,
-   gw: number
+   gw: number,
+   filterValue?: string
 }
 
-export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw }) => {
+export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw, filterValue }) => {
    const userTeam = useContext(UserTeamContext);
 
    const handleClick = () => {
@@ -67,7 +69,8 @@ export const PlayerFC: FC<PlayerProps> = ({ player, selected, setSelected, gw })
 
    return (
       <div className={selected ? 'playerSelected' : 'player'} onClick={handleClick} >
-         {`${trimName(player.first_name)}  ${trimName(player.last_name)}`}
+         <div className='listName'>{`${trimName(player.first_name)}  ${trimName(player.last_name)}`}</div>
+         <div className='playerSingleInfo'>{filterValue}</div>
          {isCaptain(userTeam, player.id, gw) && '\n(C)'}
          {isViceCaptain(userTeam, player.id, gw) && '\n(V)'}
       </div>
@@ -94,7 +97,7 @@ export const PlayerCard: FC<PlayerProps> = ({ player, selected, setSelected, gw 
          </div>
          <div className='pointsCard'>
             {'\n' +
-               getPoints(player.future_matches[gw]).toFixed(2) + ' ' +
+               getPoints(player.future_matches[gw]).toFixed(1) + ' ' +
                listOpponents(player.future_matches[gw])}
          </div>
       </div>
@@ -121,16 +124,77 @@ export const PlayerName: FC<PlayerNameProps> = ({ player, selected, setSelected 
 
 interface PlayerListProps {
    players: PlayerMap,
-   filterText: string
+   filter: FilterOptions,
+   sortBy: SortOption
 }
 
-const passFilter = (player: Player, filterText: string): boolean => {
-   const name: string = player.first_name + ' ' + player.last_name;
-   return name.toLowerCase().includes(filterText.toLowerCase());
+const passFilter = (player: Player, filter: FilterOptions): boolean => {
+   if (filter.teams.length > 0 && !filter.teams.includes(player.team)) {
+      return false;
+   }
+   if (filter.positions.length > 0 && !filter.positions.includes(player.position)) {
+      return false;
+   }
+   if (filter.text !== null) {
+      const name: string = player.first_name + ' ' + player.last_name;
+      if (!name.toLowerCase().includes(filter.text.toLowerCase())) {
+         return false;
+      }
+   }
+   return true;
 }
 
-export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
+const getFuturePointAvg = (player: Player): number => {
+   let count = 0;
+   let pts = 0;
+   for (let i in player.future_matches) {
+      for (let j in player.future_matches[i]) {
+         pts += player.future_matches[i][j].points;
+         count += 1;
+      }
+   }
+   return count === 0 ? 0 : pts / count;
+}
+
+const getPlayerPropertyFn = (sortBy: SortOption, gw: number): (p: Player) => number => {
+   switch (sortBy) {
+      case SortOptions.Cost:
+         return (p) => {return p.current_cost};
+      case SortOptions.PointsGW:
+         return (p) => {return getPoints(p.future_matches[gw])};
+      case SortOptions.PointsFutureAvg:
+         return (p) => {return getFuturePointAvg(p)};
+      case SortOptions.Default:
+      default:
+         return (p) => {return p.id};
+   }
+}
+
+const getPlayerSingleInfo = (p: Player, sortBy: SortOption, gw: number): string => {
+   switch (sortBy) {
+      case SortOptions.Cost:
+         return 'price: £' + (p.current_cost / 10).toFixed(1);
+      case SortOptions.PointsGW:
+         return 'points gw ' + gw + ': ' + getPoints(p.future_matches[gw]).toFixed(2);
+      case SortOptions.PointsFutureAvg:
+         return 'points avg: ' + getFuturePointAvg(p).toFixed(2);
+      case SortOptions.Default:
+      default:
+         return 'id: ' + p.id;
+   }
+}
+
+const playerCompare = (p1: Player, p2: Player, sortBy: SortOption, gw: number): number => {
+   const func2 = (n1: number, n2: number): number => {
+      return n1 > n2 ? -1 : n2 > n1 ? 1 : 0;
+   }
+   const func: (p: Player) => number = getPlayerPropertyFn(sortBy, gw);
+   return func2(func(p1), func(p2));
+}
+
+export const PlayerList: FC<PlayerListProps> = ({ players, filter, sortBy }) => {
    const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
+   const gw = useContext(GWContext);
 
    const setSelectedPlayerCallback = useCallback(
       selectedPlayer => {
@@ -139,19 +203,26 @@ export const PlayerList: FC<PlayerListProps> = ({ players, filterText }) => {
       []
    );
 
-   let playerRenders = [];
+   let filteredPlayers: Player[] = [];
    for (let i in players) {
-      if (i in players && passFilter(players[i], filterText)) {
-         if (selectedPlayer !== null && selectedPlayer === players[i].id) {
-            playerRenders.push(<PlayerDetail key={players[i].id}
-               player={players[i]} setSelected={setSelectedPlayer} />)
-         }
-         else {
-            playerRenders.push(<PlayerFC key={players[i].id} player={players[i]}
-               selected={false}
-               setSelected={setSelectedPlayerCallback} gw={0} />);
-         }
+      if (passFilter(players[i], filter)) {
+         filteredPlayers.push(players[i]);
       }
+   }
+
+   filteredPlayers.sort((p1: Player, p2: Player) => {
+      return playerCompare(p1, p2, sortBy, gw);
+   });
+
+   let playerRenders = [];
+
+   for (let i in filteredPlayers) {
+      selectedPlayer !== null && selectedPlayer === filteredPlayers[i].id ?
+         playerRenders.push(<PlayerDetail key={filteredPlayers[i].id}
+            player={filteredPlayers[i]} setSelected={setSelectedPlayer} />) :
+         playerRenders.push(<PlayerFC key={filteredPlayers[i].id} player={filteredPlayers[i]}
+            selected={false} setSelected={setSelectedPlayerCallback} gw={gw}
+            filterValue={getPlayerSingleInfo(filteredPlayers[i], sortBy, gw)} />);
    }
    return (
       <div>
@@ -226,7 +297,7 @@ const getMatchesInGW = (player: Player, gw: number): JSX.Element[] => {
    return matchesInGw;
 }
 
-const getPosition = (posId: number): string => {
+export const getPosition = (posId: number): string => {
    switch(posId){
       case 1: return 'GKP'
       case 2: return 'DEF'

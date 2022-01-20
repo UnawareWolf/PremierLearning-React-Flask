@@ -303,7 +303,6 @@ class AbstractSquad(ABC):
             #
             # for transfer in suggested_transfers:
             #     self.make_transfer(transfer)
-        
         return strategy
 
     def get_accurate_points_for_strategy(self, transfer_strategy):
@@ -397,16 +396,24 @@ class AbstractSquad(ABC):
             transfers_this_week = transfer_list[:transfer_count]
             del transfer_list[:transfer_count]
             if not self.transfers_within_budget(transfers_this_week, temp_budget):
-                points = 0
-                break
+                return 0
             current_squad = self.static_do_transfers(current_squad, transfers_this_week)
             for transfer in transfers_this_week:
                 temp_budget += transfer.get_net_value()
             if not self.squad_is_valid(current_squad):
-                points = 0
-                break
-            for player in current_squad:
-                points += player.get_points_in_gameweek_n(gameweek, 1, self.bench_boost_gw, self.free_hit_gw)
+                return 0
+            
+            count = 0
+            sorted_squad = sorted(current_squad, key=lambda p:
+                p.get_points_in_gameweek_n(gameweek, 1, self.bench_boost_gw, self.free_hit_gw))
+            player_pos_count = {1: 1, 2: 5, 3: 5, 4: 3}
+            while count <= 11:
+                player = sorted_squad.pop()
+                if player_pos_count[player.position] > 0:
+                    points += player.get_points_in_gameweek_n(gameweek, 1, self.bench_boost_gw, self.free_hit_gw)
+                    player_pos_count[player.position] -= 1
+                    count += 1
+
             gameweek += 1
         return points
 
