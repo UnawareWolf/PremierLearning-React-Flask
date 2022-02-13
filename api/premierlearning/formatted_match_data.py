@@ -1,4 +1,15 @@
+from premierlearning.clean_match import CleanMatch
+from typing import List
+
+
+GOALS_SCORED_KEYS = [
+    'matches_played',
+    'player_average_points',
+    'player_point_deviation'
+]
+
 class FormattedMatchData:
+    # rename to MatchProcessor
 
     def __init__(self, match):
         self.matches_played = match.matches_played
@@ -31,6 +42,13 @@ class FormattedMatchData:
 
         self.player_points = match.points
 
+        # self.clean_match: CleanMatch = {
+        #     'is_valid': match.is_valid,
+        #     'matches_played': self.matches_played,
+        #     'player_average_points': self.player_average_points,
+        #     'player_point_deviation': self.player_point_deviation
+        # }
+
         self.input = [self.matches_played, self.player_average_points, self.player_point_deviation,
                       self.player_points_last_5, self.player_points_last_3, self.player_points_last,
                       self.ict_point_deviation, self.is_gkp, self.is_def, self.is_mid, self.is_att,
@@ -40,6 +58,12 @@ class FormattedMatchData:
                       self.last_season_points_per_min]
 
         self.output = [self.player_points]
+
+        # def get_inputs_from_data_key(key_name: List[str]) -> list:
+        #     inputs = []
+        #     for data_key in key_name:
+        #         inputs.append(self.clean_match[data_key])
+        #     return inputs
 
     @staticmethod
     def string_to_bool(true_or_false):

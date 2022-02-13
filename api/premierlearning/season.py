@@ -103,6 +103,12 @@ class Season(ABC):
     @abstractmethod
     def populate_teams(self):
         pass
+    
+    # def update_future_matches(self):
+    #     for player in self.players:
+    #         for future_match in player.future_matches:
+    #             future_match.calc_points_from_stats()
+    #             future_match.set_minutes_from_stats()
 
 
 class CurrentSeason(Season):

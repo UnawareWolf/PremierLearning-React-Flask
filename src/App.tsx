@@ -61,7 +61,7 @@ interface PlayersState {
 
 const getNextGW = (game_events: any[]): number => {
    for (let event_id in game_events) {
-      if (game_events[event_id].is_current) {
+      if (game_events[event_id].is_next) {
          return game_events[event_id].id;
       }
    }
