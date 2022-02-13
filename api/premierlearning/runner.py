@@ -1,6 +1,5 @@
 import sys
 import requests
-import numpy
 import os.path
 from premierlearning.clean_match import BUILT_KEYS, CHANCE_TO_PLAY, STAT_KEYS, get_input_keys
 
@@ -8,36 +7,20 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from premierlearning.learning import *
 
-from keras.models import Sequential
-from keras.layers import Dense
 from sklearn import linear_model
 from .season import *
-# from .formatted_match_data import FormattedMatchData
 from persistence import DB_Handler
 
 FANTASY_API = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 FIXTURES_API = 'https://fantasy.premierleague.com/api/fixtures/'
 PLAYER_API = 'https://fantasy.premierleague.com/api/element-summary/%i/'
-QUICK_RUN = False
-ALWAYS_UPDATE = False
 
 
 class Runner:
     def __init__(self):
-        # self.points_learner_input = []
-        # self.points_learner_output = []
-        # self.minutes_learner_input = []
-        # self.minutes_learner_output = []
         self.squad = None
         self.current_season = None
         self.past_seasons = []
-        # self.epochs = 8
-        # self.batch_size = 32
-        # self.model_repetitions = 4
-        # if QUICK_RUN:
-        #     self.epochs = 2
-        #     self.batch_size = 32
-        #     self.model_repetitions = 2
 
     def run(self):
         self.update_persisted_data_if_outdated()
@@ -50,11 +33,8 @@ class Runner:
         self.calculate_player_ict_and_points_regression()
 
         print('Preparing data for learning...')
-        # self.populate_formatted_match_data()
 
         self.learn()
-
-        # self.current_season.update_future_matches()
 
         self.current_season.calculate_player_points_over_next_5_gameweeks()
 
@@ -143,22 +123,6 @@ class Runner:
             for player in season.players:
                 player.process_matches()
 
-    # def populate_formatted_match_data(self):
-    #     self.populate_learning_inputs_for_season(self.current_season)
-    #     for season in self.past_seasons:
-    #         self.populate_learning_inputs_for_season(season)
-
-    # def populate_learning_inputs_for_season(self, season):
-    #     for player in season.players:
-    #         for match in player.matches:
-    #             self.minutes_learner_input.append([match.minutes_last, match.average_minutes_last_3,
-    #                                                match.average_minutes_last_5, match.average_minutes,
-    #                                                match.matches_available, match.average_points_in_previous_matches])
-    #             self.minutes_learner_output.append([match.minutes])
-    #             if match.valid_for_learning:
-    #                 formatted_match_data = FormattedMatchData(match)
-    #                 self.points_learner_input.append(formatted_match_data.input)
-    #                 self.points_learner_output.append(formatted_match_data.output)
 
     def populate_formatted_match_data(self):
         learner_input = self.get_learning_inputs_for_season(self.current_season)
@@ -170,16 +134,6 @@ class Runner:
         learner_input = []
         for player in season.players:
             for match in player.matches:
-                # # self.minutes_learner_input.append([match.minutes_last, match.average_minutes_last_3,
-                # #                                    match.average_minutes_last_5, match.average_minutes,
-                # #                                    match.matches_available, match.average_points_in_previous_matches])
-                # # self.minutes_learner_output.append([match.minutes])
-                # if match.valid_for_learning:
-                #     # formatted_match_data = FormattedMatchData(match)
-                #     # learner_input.append(formatted_match_data.input)
-                #     learner_input.append(match.to_clean_match())
-                #     # self.points_learner_output.append(formatted_match_data.output)
-                
                 learner_input.append(match.to_clean_match())
         return learner_input
 
@@ -220,46 +174,6 @@ class Runner:
         #
         # pyplot.show()
 
-    # @staticmethod
-    # def loss_season_one(y_true, y_pred):
-    #     y_true = float(y_true)
-    #     y_pred = float(y_pred)
-
-    #     return abs(y_true - y_pred) ** 2
-
-    # def predict_minutes(self, future_matches):
-
-    #     model = Sequential()
-    #     model.add(Dense(6, input_dim=6, activation='relu'))
-    #     model.add(Dense(3, activation='relu'))
-    #     model.add(Dense(1))
-
-    #     model.compile(loss=self.loss_season_one, optimizer='adam')
-
-    #     self.minutes_learner_input = numpy.array(self.minutes_learner_input)
-    #     self.minutes_learner_output = numpy.array(self.minutes_learner_output)
-
-    #     train_length = int(len(self.minutes_learner_output) * 4 / 5)
-
-    #     input_train = self.minutes_learner_input[:train_length, :]
-    #     output_train = self.minutes_learner_output[:train_length, :]
-    #     input_test = self.minutes_learner_input[train_length:, :]
-    #     output_test = self.minutes_learner_output[train_length:, :]
-
-    #     model.fit(input_train, output_train, epochs=self.epochs, batch_size=self.batch_size, verbose=0)
-
-    #     model.evaluate(input_test, output_test)
-
-    #     input_data = []
-
-    #     for match in future_matches:
-    #         input_data.append([match.minutes_last, match.average_minutes_last_3,
-    #                            match.average_minutes_last_5, match.average_minutes,
-    #                            match.matches_available, match.average_points_in_previous_matches])
-
-    #     numpy_input_data = numpy.array(input_data)
-    #     future_predictions = model.predict(numpy_input_data)
-    #     return future_predictions
 
     def learn(self):
         clean_matches = self.populate_formatted_match_data()
@@ -273,24 +187,11 @@ class Runner:
                 future_matches.append(future_match)
                 future_clean_matches.append(future_match.to_clean_match())
         
-        # points_pred = get_avg_predictions(clean_matches, future_clean_matches, MLOptions(
-        #     self.model_repetitions, self.epochs, self.batch_size, POINTS_KEYS, 'points_out'
-        # ))
-        # points_pred = get_avg_predictions(clean_matches, future_clean_matches, POINTS_KEYS, 'points')
-        # goals_pred = get_avg_predictions(clean_matches, future_clean_matches, MLOptions(
-        #     self.model_repetitions, self.epochs, self.batch_size, GOALS_KEYS, 'goals_out'
-        # ))
-        # assists_pred = get_avg_predictions(clean_matches, future_clean_matches, MLOptions(
-        #     self.model_repetitions, self.epochs, self.batch_size, GOALS_KEYS, 'assists_out'
-        # ))
-
         learnt_stats = {}
         for key in STAT_KEYS + BUILT_KEYS:
             learnt_stats[key] = get_avg_predictions(valid_clean_matches, future_clean_matches, get_input_keys(key), key, True)
         
         learnt_stats[CHANCE_TO_PLAY] = get_avg_predictions(clean_matches, future_clean_matches, get_input_keys(CHANCE_TO_PLAY), CHANCE_TO_PLAY, False)
-
-        # mins_pred = get_avg_predictions()
 
         def set_zero_if_neg(val):
             if val < 0:
@@ -298,93 +199,12 @@ class Runner:
             return val
 
         for i in range(len(future_matches)):
-            # future_matches[i].points = points_pred[i][0]
             for key in STAT_KEYS + BUILT_KEYS + [CHANCE_TO_PLAY]:
-                # if key == 'total_points':
-                #     future_matches[i].game_stats[key] = learnt_stats[key][i][0]
-                # else:
                 future_matches[i].game_stats[key] = set_zero_if_neg(learnt_stats[key][i][0])
             future_matches[i].calc_points_from_stats()
             future_matches[i].set_minutes_from_stats()
             future_matches[i].update_points_based_on_expected_minutes()
 
-            # future_matches[i].goals_scored = set_zero_if_neg(goals_pred[i][0])
-            # future_matches[i].assists = set_zero_if_neg(assists_pred[i][0])
-
-        # future_matches = []
-
-        # for player in self.current_season.players:
-        #     for future_match in player.future_matches:
-        #         future_matches.append(future_match)
-
-        # model_predictions = []
-        # minute_predictions = []
-
-        # for i in range(self.model_repetitions):
-        #     model_predictions.append(self.get_single_model_predictions(future_matches))
-        #     minute_predictions.append(self.predict_minutes(future_matches))
-
-        # averaged_predictions = []
-        # for i in range(len(model_predictions[0])):
-        #     single_match_predictions = []
-        #     for prediction_array in model_predictions:
-        #         single_match_predictions.append(prediction_array[i])
-        #     averaged_predictions.append(sum(single_match_predictions)/len(single_match_predictions))
-
-        # averaged_minute_predictions = []
-        # for i in range(len(minute_predictions[0])):
-        #     single_match_minute_predictions = []
-        #     for prediction_array in minute_predictions:
-        #         single_match_minute_predictions.append(prediction_array[i])
-        #     averaged_minute_predictions.append(sum(single_match_minute_predictions)/len(single_match_minute_predictions))
-
-        # for i in range(len(future_matches)):
-        #     future_matches[i].points = averaged_predictions[i][0]
-        #     future_matches[i].minutes = averaged_minute_predictions[i][0]
-        #     future_matches[i].update_points_based_on_expected_minutes()
-
-    # def get_single_model_predictions(self, future_matches):
-    #     model = Sequential()
-    #     model.add(Dense(22, input_dim=22, activation='relu'))
-    #     model.add(Dense(10, activation='relu'))
-    #     model.add(Dense(1))
-
-    #     model.compile(loss=self.loss_season_one, optimizer='adam')
-
-    #     self.points_learner_input = numpy.array(self.points_learner_input)
-    #     self.points_learner_output = numpy.array(self.points_learner_output)
-
-    #     train_length = int(len(self.points_learner_input) * 4 / 5)
-
-    #     input_train = self.points_learner_input[:train_length, :]
-    #     output_train = self.points_learner_output[:train_length, :]
-    #     input_test = self.points_learner_input[train_length:, :]
-    #     output_test = self.points_learner_output[train_length:, :]
-
-    #     # model.fit(input_train, output_train, epochs=8, batch_size=16)
-    #     model.fit(input_train, output_train, epochs=self.epochs, batch_size=self.batch_size, verbose=0)
-
-    #     model.evaluate(input_test, output_test)
-
-    #     # predictions = model.predict(input_test)
-    #     #
-    #     # model.summary()
-
-    #     # matches = []
-    #     input_data = []
-
-    #     for future_match in future_matches:
-    #         input_data.append(FormattedMatchData(future_match).input)
-
-    #     # for player in self.current_season.players:
-    #     #     for future_match in player.future_matches:
-    #     #         matches.append(future_match)
-    #     #         input_data.append(FormattedMatchData(future_match).input)
-    #             # future_match.points = model.predict(numpy.array([FormattedMatchData(future_match).input]))[0][0]
-
-    #     numpy_input_data = numpy.array(input_data)
-    #     future_predictions = model.predict(numpy_input_data)
-    #     return future_predictions
     
     def persist_players(self):
         print('Connecting to database')

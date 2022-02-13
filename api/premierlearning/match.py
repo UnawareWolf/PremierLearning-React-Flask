@@ -54,30 +54,11 @@ class AbstractMatch(RawMatch):
         self.team_match = self.get_team_match()
         self.opponent = self.opponent_team.name
 
-        # self.average_points_in_previous_matches = 0
-        # self.average_points_last_5 = 0
-        # self.average_points_last_3 = 0
-        # self.points_last = 0
-
         self.ict_point_regression_deviation = 0
         self.matches_played = 0
-        # self.player_point_deviation_per_game = 0
-
-        # self.minutes_last = 0
-        # self.average_minutes_last_3 = 0
-        # self.average_minutes_last_5 = 0
-        # self.average_minutes = 0
         self.matches_available = 0
         self.valid_for_learning = False
 
-        # self.goals_scored = 0
-        # self.assists = 0
-
-        # self.stat_windows = {
-        #     'points': get_default_stat_window(),
-        #     'goals_scored': get_default_stat_window()
-        # }
-        # self.stat_windows = get_default()
         self.past_stats: PastStats = get_default_past_stats()
         self.game_stats: GameStats = get_default_game_stats()
 
@@ -252,13 +233,6 @@ class FutureMatch(AbstractMatch):
         return self.team.team_match_dict[self.fixture_id]
 
     def update_points_based_on_expected_minutes(self):
-        # if self.minutes <= 40 or self.average_minutes_last_3 < 40 or self.matches_played < 3:
-        #     self.points = 0
-        # if self.chance_of_playing is not None:
-        #     self.points = self.chance_of_playing * self.points / 100
-        # # expected_points_per_min = self.points / 90
-        # # self.points = expected_points_per_min * self.expected_minutes
-
         if self.game_stats['minutes'] <= 40 or self.past_stats['chance_to_play']['last_3_avg'] < 0.44 or self.matches_played < 3:
             self.points = 0
         if self.chance_of_playing is not None:

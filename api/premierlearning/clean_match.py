@@ -67,8 +67,7 @@ STAT_KEYS = [
 BUILT_KEYS = [
     'conceded_2_plus',
     'conceded_4_plus',
-    'minutes_60_plus',
-    # 'chance_to_play'
+    'minutes_60_plus'
 ]
 
 CHANCE_TO_PLAY = 'chance_to_play'
@@ -97,19 +96,10 @@ def get_default_stat_window() -> StatWindow:
     return stat_window
 
 
-# def get_final_stats_initial_values():
-#     stats = {}
-#     for key in get_default_preds_out().keys():
-#         stats[key] = get_default_stat_window()
-#     return stats
-
 class CleanMatch(TypedDict):
     is_valid: bool
     matches_played: int
     past_stats: PastStats
-    # points: StatWindow
-    # goals_scored: StatWindow
-    # assists: StatWindow
     ict_point_deviation: float
     is_gkp: int
     is_def: int
@@ -127,15 +117,7 @@ class CleanMatch(TypedDict):
     played_last_season: int
     last_season_points_per_min: float
     game_stats: GameStats
-    # points_out: float
-    # goals_out: float
 
-
-# LEARNING_KEYS = [
-#     'points',
-#     'goals_scored',
-#     'assists'
-# ]
 
 STANDARD_STAT_KEYS = [
     'matches_played',
@@ -199,7 +181,6 @@ def get_input_keys(key) -> List[str]:
     elif key in ('minutes_60_plus', 'minutes'):
         return ['minutes']
     return [key]
-    # return ('chance_to_play', 'minutes')
 
 
 def get_inputs_from_data_key(clean_matches: List[CleanMatch], special_keys: List[str], include_standard_stats) -> list:
@@ -211,11 +192,6 @@ def get_inputs_from_data_key(clean_matches: List[CleanMatch], special_keys: List
                 clean_match_array.append(clean_match[data_key])
         for data_key in special_keys:
             clean_match_array.extend(clean_match['past_stats'][data_key].values())
-        # for data_key in key_name:
-        #     if isinstance(clean_match[data_key], dict):
-        #         clean_match_array.extend(clean_match[data_key].values())
-        #     else:
-        #         clean_match_array.append(clean_match[data_key])
         inputs.append(clean_match_array)
     return inputs
 
